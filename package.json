@@ -1,0 +1,57 @@
+{
+  "name": "asapio-aci-docs",
+  "displayName": "ASAPIO ACI Docs",
+  "description": "MCP Server for ASAPIO ACI Documentation – search and retrieve docs directly in GitHub Copilot Chat",
+  "version": "1.0.0",
+  "publisher": "ASAPIO",
+  "author": "ASAPIO GmbH <info@asapio.com>",
+  "license": "MIT",
+  "icon": "images/icon.png",
+  "homepage": "https://asapio.com/docs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AsapioCompany/mcp-aci-docs.git"
+  },
+  "engines": {
+    "vscode": "^1.99.0"
+  },
+  "categories": ["AI", "Other"],
+  "keywords": ["asapio", "aci", "mcp", "documentation", "copilot"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./src/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "ASAPIO ACI Docs",
+      "properties": {
+        "asapioAciDocs.docsBaseUrl": {
+          "type": "string",
+          "default": "https://asapio.com/docs",
+          "description": "Base URL of the ASAPIO ACI documentation"
+        },
+        "asapioAciDocs.cacheTtlSeconds": {
+          "type": "number",
+          "default": 3600,
+          "description": "How long to cache documentation pages (in seconds)"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "asapioAciDocs.reload",
+        "title": "ASAPIO ACI Docs: Reload Documentation Cache"
+      },
+      {
+        "command": "asapioAciDocs.showStatus",
+        "title": "ASAPIO ACI Docs: Show Status"
+      }
+    ]
+  },
+  "scripts": {
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.99.0",
+    "@vscode/vsce": "^3.0.0"
+  }
+}
