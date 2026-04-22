@@ -1,0 +1,15 @@
+{
+  "servers": {
+    "asapio-aci-docs": {
+      "type": "stdio",
+      "command": "C:\\Users\\FFA\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe",
+      "args": [
+        "c:\\Users\\FFA\\.vscode\\extensions\\asapio.asapio-aci-docs-1.0.0\\server\\server.js"
+      ],
+      "env": {
+        "DOCS_BASE_URL": "https://asapio.com/docs",
+        "CACHE_TTL_SECONDS": "3600"
+      }
+    }
+  }
+}

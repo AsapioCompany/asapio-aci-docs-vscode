@@ -1,4 +1,8 @@
 .vscode/**
-node_modules/**
 *.vsix
 .gitignore
+# Exclude all node_modules except required ones
+node_modules/**
+!node_modules/@modelcontextprotocol/**
+!node_modules/zod/**
+!node_modules/node-html-parser/**
