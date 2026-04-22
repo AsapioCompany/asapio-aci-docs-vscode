@@ -15,6 +15,7 @@ Search and retrieve **ASAPIO Integration Add-on documentation** directly inside 
 2. Restart VS Code
 3. Open Copilot Chat and try:
 
+npm install @modelcontextprotocol/sdk zod node-html-parser --omit=dev
 ```
 Search the ASAPIO documentation for "connector setup"
 List all available ASAPIO documentation pages

@@ -2,7 +2,7 @@
   "name": "asapio-aci-docs",
   "displayName": "ASAPIO ACI Docs",
   "description": "MCP Server for ASAPIO Integration Add-on Documentation – search and retrieve docs directly in GitHub Copilot Chat",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "ASAPIO",
   "author": "ASAPIO GmbH <info@asapio.com>",
   "license": "MIT",
@@ -15,9 +15,23 @@
   "engines": {
     "vscode": "^1.99.0"
   },
-  "categories": ["AI", "Other"],
-  "keywords": ["asapio", "aci", "mcp", "documentation", "copilot", "sap", "integration", "s4hana"],
-  "activationEvents": ["onStartupFinished"],
+  "categories": [
+    "AI",
+    "Other"
+  ],
+  "keywords": [
+    "asapio",
+    "aci",
+    "mcp",
+    "documentation",
+    "copilot",
+    "sap",
+    "integration",
+    "s4hana"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./src/extension.js",
   "contributes": {
     "configuration": {
@@ -53,5 +67,10 @@
   "devDependencies": {
     "@types/vscode": "^1.99.0",
     "@vscode/vsce": "^3.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "node-html-parser": "^7.1.0",
+    "zod": "^4.3.6"
   }
 }
