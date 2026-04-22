@@ -1,5 +1,56 @@
 #!/usr/bin/env node
 
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
+import { parse } from "node-html-parser";
+import https from "https";
+import http from "http";
+import fs from "fs";
+import path from "path";
+import { marked } from "marked";
+
+// ─── Overview Mapping ───────────────────────────────────────────────────────
+let overviewMap = null;
+function loadOverviewMap() {
+  const overviewPath = path.join(LOCAL_DOCS_DIR, "overview.md");
+  if (!fs.existsSync(overviewPath)) return null;
+  const md = fs.readFileSync(overviewPath, "utf-8");
+  // Simple parser: map [Title](file.md) to file.md, collect section headings
+  const lines = md.split(/\r?\n/);
+  const map = {};
+  let currentFile = null;
+  for (const line of lines) {
+    const m = line.match(/^###? \[(.+?)\]\((.+?\.md)\)/);
+    if (m) {
+      currentFile = m[2];
+      map[currentFile] = { title: m[1], sections: [] };
+      continue;
+    }
+    const sec = line.match(/^- \*\*(.+?)\*\*/);
+    if (currentFile && sec) {
+      map[currentFile].sections.push(sec[1]);
+    }
+  }
+  return map;
+}
+
+function findDocsForQuery(query) {
+  if (!overviewMap) overviewMap = loadOverviewMap();
+  if (!overviewMap) return [];
+  const q = query.toLowerCase();
+  // Score by title and section match
+  const scored = Object.entries(overviewMap).map(([file, { title, sections }]) => {
+    let score = 0;
+    if (title.toLowerCase().includes(q)) score += 10;
+    for (const s of sections) {
+      if (s.toLowerCase().includes(q)) score += 5;
+    }
+    return { file, title, score };
+  });
+  return scored.filter(s => s.score > 0).sort((a, b) => b.score - a.score);
+}
+
 /**
  * ASAPIO ACI Docs – MCP Server (mcp-aci-docs)
  *
@@ -20,36 +71,21 @@ const CACHE_TTL_MS  = parseInt(process.env.CACHE_TTL_SECONDS || "3600") * 1000; 
 const LOCAL_DOCS_DIR = path.resolve(process.cwd(), "../docs");
 // ─── Local Docs Helpers ─────────────────────────────────────────────────────
 
+import { marked } from "marked";
+
 function listLocalDocs() {
   if (!fs.existsSync(LOCAL_DOCS_DIR)) return [];
   return fs.readdirSync(LOCAL_DOCS_DIR)
-    .filter(f => f.endsWith(".html"))
+    .filter(f => f.endsWith(".md"))
     .map(f => path.join(LOCAL_DOCS_DIR, f));
 }
 
 function readLocalDoc(docPath) {
   const fullPath = path.isAbsolute(docPath)
     ? docPath
-    : path.join(LOCAL_DOCS_DIR, docPath.replace(/^\/+/, ""));
+    : path.join(LOCAL_DOCS_DIR, docPath.replace(/^\/+/ , ""));
   if (fs.existsSync(fullPath)) {
-    let html = fs.readFileSync(fullPath, "utf-8");
-    // Embed images as base64
-    html = html.replace(/<img\s+[^>]*src=["']([^"']+)["'][^>]*>/gi, (match, src) => {
-      // Only embed relative images (not http/https/data)
-      if (/^(https?:|data:)/i.test(src)) return match;
-      // Resolve image path relative to doc file
-      const imgPath = path.resolve(path.dirname(fullPath), src);
-      if (fs.existsSync(imgPath)) {
-        const ext = path.extname(imgPath).slice(1).toLowerCase();
-        const mime = ext === "svg" ? "image/svg+xml" : `image/${ext}`;
-        const data = fs.readFileSync(imgPath);
-        const base64 = data.toString("base64");
-        const dataUrl = `data:${mime};base64,${base64}`;
-        return match.replace(src, dataUrl);
-      }
-      return match;
-    });
-    return html;
+    return fs.readFileSync(fullPath, "utf-8");
   }
   return null;
 }
@@ -63,61 +99,36 @@ let   indexCache = null;     // { pages, builtAt }
 
 // ─── HTML → Document & Section Extraction ────────────────────────────────────
 
-function parseDoc(html, url) {
-  const root = parse(html);
-
-  const title =
-    root.querySelector("title")?.text?.trim() ||
-    root.querySelector("h1")?.text?.trim() ||
-    url.split("/").filter(Boolean).pop() ||
-    url;
-
-  const description =
-    root.querySelector('meta[name="description"]')?.getAttribute("content") ||
-    root.querySelector('meta[property="og:description"]')?.getAttribute("content") ||
-    "";
-
-  for (const sel of ["nav","header","footer","script","style",
-                      ".sidebar","#sidebar",".nav","#nav",".menu","#menu"]) {
-    root.querySelectorAll(sel).forEach((el) => el.remove());
-  }
-
-  const mainEl  = root.querySelector("main, article, .content, #content, .docs-content, body") || root;
-  // Extract sections: group by h1/h2/h3, or fallback to paragraphs
+function parseDoc(md, url) {
+  // Use marked lexer to extract tokens
+  const tokens = marked.lexer(md);
+  let title = "";
+  let description = "";
+  let content = "";
+  let headings = [];
   let sections = [];
   let current = null;
-  mainEl.childNodes.forEach((node) => {
-    if (!node.tagName) return;
-    const tag = node.tagName.toLowerCase();
-    if (["h1","h2","h3"].includes(tag)) {
+  for (const token of tokens) {
+    if (token.type === "heading" && token.depth <= 3) {
       if (current) sections.push(current);
-      current = { heading: node.text.trim(), html: "", nodes: [] };
+      current = { heading: token.text, md: "", tokens: [] };
+      headings.push(token.text);
+      if (!title && token.depth === 1) title = token.text;
     }
     if (current) {
-      current.html += node.toString();
-      current.nodes.push(node);
+      current.md += token.raw || token.text || "";
+      current.tokens.push(token);
     }
-  });
-  if (current) sections.push(current);
-  // If no headings, fallback to paragraphs
-  if (sections.length === 0) {
-    mainEl.querySelectorAll("p,li,div").forEach((el) => {
-      const text = el.text.trim();
-      if (text.length > 0) {
-        sections.push({ heading: "", html: el.toString(), nodes: [el] });
-      }
-    });
   }
+  if (current) sections.push(current);
+  if (!title && headings.length > 0) title = headings[0];
+  if (!title) title = url.split("/").filter(Boolean).pop() || url;
+  content = md.slice(0, 8000);
   // Fallback: whole content
   if (sections.length === 0) {
-    sections.push({ heading: title, html: mainEl.toString(), nodes: [mainEl] });
+    sections.push({ heading: title, md, tokens: tokens });
   }
-
-  const content = mainEl.text.replace(/\s+/g, " ").trim().slice(0, 8000);
-  const headings = root.querySelectorAll("h1, h2, h3").map((h) => h.text.trim()).filter(Boolean);
-  const path = url;
-
-  return { url, path, title, description, content, headings, sections };
+  return { url, path: url, title, description, content, headings, sections };
 }
 
 // ─── Build index ──────────────────────────────────────────────────────────────
@@ -155,11 +166,20 @@ function scoreSection(section, terms) {
 }
 
 async function searchDocs(query, limit = 5) {
-  const pages = await buildIndex();
+  // Use overview map to prioritize relevant docs
+  const overviewHits = findDocsForQuery(query);
+  let prioritizedFiles = overviewHits.map(h => path.join(LOCAL_DOCS_DIR, h.file));
+  // Fallback: all docs
+  if (prioritizedFiles.length === 0) {
+    prioritizedFiles = listLocalDocs();
+  }
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-  // For each page, find best section
   const results = [];
-  for (const p of pages) {
+  for (const f of prioritizedFiles) {
+    const md = readLocalDoc(f);
+    if (!md) continue;
+    const url = `file://${f}`;
+    const p = parseDoc(md, url);
     let bestSection = null;
     let bestScore = 0;
     for (const section of (p.sections || [])) {
@@ -172,6 +192,7 @@ async function searchDocs(query, limit = 5) {
     if (bestSection && bestScore > 0) {
       results.push({ ...p, bestSection, score: bestScore });
     }
+    if (results.length >= limit) break;
   }
   return results.sort((a, b) => b.score - a.score).slice(0, limit);
 }
@@ -211,14 +232,13 @@ server.tool(
     if (results.length === 0) {
       return { content: [{ type: "text", text: `No results found for: "${query}"` }] };
     }
-    // Show only the most relevant section (with images)
+    // Show only the most relevant section (render markdown)
     const text = results.map((doc, i) => [
       `### ${i + 1}. ${doc.title}`,
-      `**URL:** ${doc.url}`,
-      doc.description ? `**Description:** ${doc.description}` : "",
+      `**File:** ${doc.path}`,
       doc.headings.length ? `**Sections:** ${doc.headings.slice(0, 6).join(" · ")}` : "",
       doc.bestSection.heading ? `**Section:** ${doc.bestSection.heading}` : "",
-      doc.bestSection.html,
+      doc.bestSection.md || ""
     ].filter(Boolean).join("\n")).join("\n\n---\n\n");
 
     return { content: [{ type: "text", text: `${results.length} result(s) for "${query}":\n\n${text}` }] };
@@ -234,12 +254,12 @@ server.tool(
   },
   async ({ path: docPath, query }) => {
     // Only use local docs
-    let html = readLocalDoc(docPath);
+    let md = readLocalDoc(docPath);
     let url = docPath;
-    if (!html) {
+    if (!md) {
       return { content: [{ type: "text", text: `Document '${docPath}' not found locally.` }] };
     }
-    const doc  = parseDoc(html, url);
+    const doc  = parseDoc(md, url);
     // If a query is provided, show only the most relevant section
     if (query) {
       const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
@@ -253,13 +273,13 @@ server.tool(
         }
       }
       if (bestSection && bestScore > 0) {
-        const text = [`# ${doc.title}`, doc.url, doc.description ? `> ${doc.description}` : "", bestSection.heading ? `## ${bestSection.heading}` : "", bestSection.html]
+        const text = [`# ${doc.title}`, doc.url, bestSection.heading ? `## ${bestSection.heading}` : "", bestSection.md]
           .filter((l) => l !== "").join("\n");
         return { content: [{ type: "text", text }] };
       }
     }
     // Fallback: show all content
-    const text = [`# ${doc.title}`, doc.url, doc.description ? `> ${doc.description}` : "", "", doc.content]
+    const text = [`# ${doc.title}`, doc.url, "", doc.content]
       .filter((l) => l !== "").join("\n");
     return { content: [{ type: "text", text }] };
   }

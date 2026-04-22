@@ -2,7 +2,7 @@
   "name": "asapio-aci-docs",
   "displayName": "ASAPIO Docs MCP",
   "description": "MCP Server for ASAPIO Integration Add-on Documentation – search and retrieve docs directly in GitHub Copilot Chat",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "publisher": "ASAPIO",
   "author": "ASAPIO GmbH <info@asapio.com>",
   "license": "MIT",
@@ -52,11 +52,20 @@
       {
         "command": "asapioAciDocs.showStatus",
         "title": "ASAPIO ACI Docs: Show Status"
+      },
+      {
+        "command": "asapio.asapio",
+        "title": "/asapio: Search ASAPIO Documentation"
+      },
+      {
+        "command": "asapio.detectInPalette",
+        "title": "ASAPIO: Detect 'asapio' in Command Palette Input"
       }
     ]
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "marked": "^10.0.0",
     "node-html-parser": "^7.1.0",
     "zod": "^4.3.6"
   },

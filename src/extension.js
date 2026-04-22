@@ -20,7 +20,37 @@ async function activate(context) {
   // Register commands
   context.subscriptions.push(
     vscode.commands.registerCommand("asapioAciDocs.reload",     handleReload),
-    vscode.commands.registerCommand("asapioAciDocs.showStatus", handleShowStatus)
+    vscode.commands.registerCommand("asapioAciDocs.showStatus", handleShowStatus),
+    vscode.commands.registerCommand("asapio.asapio", handleAsapioCommand)
+  );
+
+  // Listen for 'asapio' in editor selection
+  context.subscriptions.push(
+    vscode.window.onDidChangeTextEditorSelection(async (e) => {
+      const text = e.textEditor.document.getText(e.selections[0]);
+      if (text && /asapio/i.test(text)) {
+        const action = await vscode.window.showInformationMessage(
+          `You selected text containing 'asapio'. Search ASAPIO documentation?`,
+          'Search', 'Ignore'
+        );
+        if (action === 'Search') {
+          vscode.commands.executeCommand('asapio.asapio', text);
+        }
+      }
+    })
+  );
+
+  // Listen for 'asapio' in command palette input (Quick Open)
+  context.subscriptions.push(
+    vscode.commands.registerCommand('asapio.detectInPalette', async () => {
+      const query = await vscode.window.showInputBox({
+        prompt: "Type to search ASAPIO documentation (type 'asapio' to trigger)",
+        placeHolder: "e.g. asapio connector setup, monitoring..."
+      });
+      if (query && /asapio/i.test(query)) {
+        vscode.commands.executeCommand('asapio.asapio', query);
+      }
+    })
   );
 
   // Configure MCP in every open workspace
@@ -98,6 +128,22 @@ async function handleShowStatus() {
   vscode.window.showInformationMessage(
     `ASAPIO ACI Docs MCP Server\nDocs: ${docsUrl}\nCache TTL: ${cacheTtl}s\n\nType "reload_docs" in Copilot Chat to refresh.`
   );
+}
+
+// ─── /asapio Command Handler ────────────────────────────────────────────────
+async function handleAsapioCommand(...args) {
+  let query = args && args.length > 0 ? args.join(" ") : undefined;
+  if (!query) {
+    query = await vscode.window.showInputBox({
+      prompt: "Search ASAPIO documentation (type your question or topic)",
+      placeHolder: "e.g. connector setup, event mesh, monitoring..."
+    });
+    if (!query) return;
+  }
+  // Optionally: call MCP server or show quick pick for further actions
+  vscode.commands.executeCommand("workbench.action.showCommands");
+  vscode.window.showInformationMessage(`Searching ASAPIO docs for: ${query}`);
+  // TODO: Integrate with MCP server search_docs tool
 }
 
 module.exports = { activate, deactivate };
