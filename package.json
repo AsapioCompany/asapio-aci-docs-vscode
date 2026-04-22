@@ -46,6 +46,11 @@
       }
     ]
   },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10.2",
+    "node-html-parser": "^6.1.13",
+    "zod": "^3.24.3"
+  },
   "scripts": {
     "package": "vsce package",
     "publish": "vsce publish"

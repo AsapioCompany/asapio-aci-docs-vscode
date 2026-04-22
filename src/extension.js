@@ -50,7 +50,7 @@ async function ensureMcpConfig(context) {
   const cacheTtl = config.get("cacheTtlSeconds",  3600);
 
   // server.js is bundled inside the extension under server/
-  const serverJs = context.asAbsolutePath("server/server.js");
+  const serverJs = context.asAbsolutePath("server/server.mjs");
 
   const folders = vscode.workspace.workspaceFolders || [];
   for (const folder of folders) {
