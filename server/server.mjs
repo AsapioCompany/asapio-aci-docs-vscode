@@ -56,22 +56,12 @@ function findDocsForQuery(query) {
  *
  */
 
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
-import { parse } from "node-html-parser";
-import https from "https";
-import http from "http";
-import fs from "fs";
-import path from "path";
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 
 const CACHE_TTL_MS  = parseInt(process.env.CACHE_TTL_SECONDS || "3600") * 1000; // default: 1 hour
 const LOCAL_DOCS_DIR = path.resolve(process.cwd(), "../docs");
 // ─── Local Docs Helpers ─────────────────────────────────────────────────────
-
-import { marked } from "marked";
 
 function listLocalDocs() {
   if (!fs.existsSync(LOCAL_DOCS_DIR)) return [];
