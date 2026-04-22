@@ -1,3 +1,4 @@
 remove-unreferenced-images.js
 node_modules/
 *.vsix
+.vscode/mcp.json
