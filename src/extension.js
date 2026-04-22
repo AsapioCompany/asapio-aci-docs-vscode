@@ -27,6 +27,13 @@ async function activate(context) {
     vscode.commands.registerCommand("asapio-outline",    handleAsapioOutline),
     vscode.commands.registerCommand("asapio.asapio",     handleAsapioCommand)
   );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("asapio-help", handleAsapioHelp)
+  );
+async function handleAsapioHelp() {
+  const helpText = `ASAPIO ACI Docs Extension – Usage Guide\n\n- **Search docs:** Run [36m/asapio-search[0m or type [36masapio[0m in the palette\n- **List all docs:** Run [36m/asapio-list[0m\n- **Get a doc page:** Run [36m/asapio-get[0m\n- **Show outline:** Run [36m/asapio-outline[0m\n- **Set config method:** You will be prompted for Event Studio or SAP GUI on first search (can be changed in settings)\n- **Tips:**\n  - Use keywords like "connector", "event", "monitoring"\n  - Results show all relevant sections, with images inline\n  - If no results, try a broader or different term\n\nFor more help, see the README or contact support.`;
+  vscode.window.showInformationMessage(helpText, { modal: true });
+}
 // ─── New Command Handlers ─────────────────────────────────────────────────--
 async function handleAsapioSearch() {
   const query = await vscode.window.showInputBox({
@@ -34,8 +41,22 @@ async function handleAsapioSearch() {
     placeHolder: "e.g. connector setup, event mesh, monitoring..."
   });
   if (!query) return;
-  vscode.window.showInformationMessage(`Searching ASAPIO docs for: ${query}`);
-  // TODO: Integrate with MCP server search
+  const globalState = vscode.extensions.getExtension('AsapioCompany.asapio-aci-docs-vscode')?.exports?.globalState || context.globalState;
+  let preferredConfig = globalState.get('preferredConfigMethod');
+  const configOptions = [
+    { label: "Event Studio (Fiori App)", value: "eventstudio" },
+    { label: "Classic SAP GUI", value: "sapgui" }
+  ];
+  let configMethod = configOptions.find(opt => opt.value === preferredConfig);
+  if (!configMethod) {
+    configMethod = await vscode.window.showQuickPick(configOptions, {
+      placeHolder: "Which configuration method do you use?"
+    });
+    if (!configMethod) return;
+    await globalState.update('preferredConfigMethod', configMethod.value);
+  }
+  vscode.window.showInformationMessage(`Searching ASAPIO docs for: ${query} (using ${configMethod.label})`);
+  // TODO: Integrate with MCP server search, pass configMethod.value as context
 }
 
 async function handleAsapioList() {

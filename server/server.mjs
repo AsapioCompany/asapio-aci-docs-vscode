@@ -12,6 +12,7 @@ import { marked } from "marked";
 
 // ─── Overview Mapping ───────────────────────────────────────────────────────
 let overviewMap = null;
+let docCache = new Map();
 function loadOverviewMap() {
   const overviewPath = path.join(LOCAL_DOCS_DIR, "overview.md");
   if (!fs.existsSync(overviewPath)) return null;
@@ -76,6 +77,7 @@ function readLocalDoc(docPath) {
   const fullPath = path.isAbsolute(docPath)
     ? docPath
     : path.join(LOCAL_DOCS_DIR, docPath.replace(/^\/+/ , ""));
+    if (docCache.has(fullPath)) return docCache.get(fullPath);
   if (fs.existsSync(fullPath)) {
     return fs.readFileSync(fullPath, "utf-8");
   }
@@ -143,46 +145,93 @@ async function buildIndex(force = false) {
   return pages;
 }
 
-// ─── Search & Section Scoring ────────────────────────────────────────────────
 
-function scoreSection(section, terms) {
-  let score = 0;
-  const text = section.heading + " " + (section.html ? parse(section.html).text : "");
-  for (const t of terms) {
-    if (section.heading && section.heading.toLowerCase().includes(t)) score += 10;
-    const re = new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
-    const hits = (text.toLowerCase().match(re) || []).length;
-    score += Math.min(hits, 20);
-  }
+// ─── Search & Section Scoring (Fuzzy, Phrase, Context) ─────────────────────--
+import Fuse from "fuse.js";
+
+function scoreSection(section, query) {
+  // Use Fuse.js fuzzy scoring for best match
+  const text = (section.heading + "\n" + (section.md || ""));
+  const fuse = new Fuse([{text}], { keys: ['text'], includeScore: true, threshold: 0.4 });
+  const result = fuse.search(query);
+  let score = result.length > 0 ? 100 - (result[0].score * 100) : 0;
+  // Boost for exact phrase, heading match, and context
+  if (section.heading && section.heading.toLowerCase().includes(query.toLowerCase())) score += 20;
+  if (text.toLowerCase().includes(query.toLowerCase())) score += 15;
+  // Length penalty (prefer concise answers)
+  score -= Math.floor((section.md || "").length / 2000);
   return score;
 }
 
+// Inline image embedding: replace ![...](...) with base64 data URLs if possible
+function embedImagesInMarkdown(md, docDir) {
+  return md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, relPath) => {
+    // Only handle relative paths
+    if (/^(https?:|data:)/i.test(relPath)) return match;
+    const imgPath = path.resolve(docDir, relPath);
+    if (fs.existsSync(imgPath)) {
+      const ext = path.extname(imgPath).slice(1).toLowerCase();
+      const mime = ext === "svg" ? "image/svg+xml" : `image/${ext}`;
+      const data = fs.readFileSync(imgPath);
+      const base64 = data.toString("base64");
+      return `![${alt}](data:${mime};base64,${base64})`;
+    }
+    return match;
+  });
+}
+
 async function searchDocs(query, limit = 5) {
+  // Ask user for configuration method
+  let preferEventStudio = false;
+  if (typeof globalThis.promptEventStudio === 'function') {
+    preferEventStudio = await globalThis.promptEventStudio();
+  }
   // Use overview map to prioritize relevant docs
-  const overviewHits = findDocsForQuery(query);
-  let prioritizedFiles = overviewHits.map(h => path.join(LOCAL_DOCS_DIR, h.file));
-  // Fallback: all docs
+  let overviewHits = findDocsForQuery(query);
+  let prioritizedFiles;
+  if (preferEventStudio) {
+    // Always include eventstudio.md and any connector page in the top results
+    const eventStudioFile = overviewHits.find(h => h.file === 'eventstudio.md');
+    // Heuristic: connector pages often have 'connector' or 'connectors/' in the filename
+    const connectorFiles = overviewHits.filter(h => /connector|connectors\//i.test(h.file));
+    const rest = overviewHits.filter(h => h.file !== 'eventstudio.md' && !/connector|connectors\//i.test(h.file));
+    prioritizedFiles = [
+      ...(eventStudioFile ? [eventStudioFile] : []),
+      ...connectorFiles,
+      ...rest
+    ].map(h => path.join(LOCAL_DOCS_DIR, h.file));
+  } else {
+    prioritizedFiles = overviewHits.map(h => path.join(LOCAL_DOCS_DIR, h.file));
+  }
   if (prioritizedFiles.length === 0) {
     prioritizedFiles = listLocalDocs();
   }
-  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
   const results = [];
   for (const f of prioritizedFiles) {
     const md = readLocalDoc(f);
     if (!md) continue;
     const url = `file://${f}`;
-    const p = parseDoc(md, url);
-    let bestSection = null;
-    let bestScore = 0;
-    for (const section of (p.sections || [])) {
-      const score = scoreSection(section, terms);
-      if (score > bestScore) {
-        bestScore = score;
-        bestSection = section;
+      let p = docCache.get(f + ':parsed');
+      if (!p) {
+        p = parseDoc(md, url);
+        docCache.set(f + ':parsed', p);
       }
-    }
-    if (bestSection && bestScore > 0) {
-      results.push({ ...p, bestSection, score: bestScore });
+    // Score all sections, not just best
+    const scoredSections = (p.sections || []).map(section => {
+      return { section, score: scoreSection(section, query) };
+    }).filter(s => s.score > 0);
+    // Sort and take top N sections per file
+    scoredSections.sort((a, b) => b.score - a.score);
+    const topSections = scoredSections.slice(0, 2); // up to 2 per file
+    for (const {section, score} of topSections) {
+      // Embed images in the section markdown
+      const docDir = path.dirname(f);
+      let mdWithImages = embedImagesInMarkdown(section.md, docDir);
+      // Highlight matches
+      const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, 'gi');
+      mdWithImages = mdWithImages.replace(re, '**$1**');
+      results.push({ ...p, bestSection: {...section, md: mdWithImages}, score });
+      if (results.length >= limit) break;
     }
     if (results.length >= limit) break;
   }
@@ -222,18 +271,24 @@ server.tool(
   async ({ query, limit }) => {
     const results = await searchDocs(query, limit);
     if (results.length === 0) {
-      return { content: [{ type: "text", text: `No results found for: "${query}"` }] };
-    }
-    // Show only the most relevant section (render markdown)
-    const text = results.map((doc, i) => [
-      `### ${i + 1}. ${doc.title}`,
-      `**File:** ${doc.path}`,
-      doc.headings.length ? `**Sections:** ${doc.headings.slice(0, 6).join(" · ")}` : "",
-      doc.bestSection.heading ? `**Section:** ${doc.bestSection.heading}` : "",
-      doc.bestSection.md || ""
-    ].filter(Boolean).join("\n")).join("\n\n---\n\n");
+      return { content: [{ type: "text", text: `❌ **No results found for:** "${query}"
 
-    return { content: [{ type: "text", text: `${results.length} result(s) for "${query}":\n\n${text}` }] };
+**Tips:**
+- Check your spelling or try a different keyword
+- Try a more general term (e.g. "connector" or "event")
+- Use the "/asapio" command for guided search
+- Type "/asapio-help" for usage instructions
+` }] };
+    }
+    // Show all relevant sections, formatted
+    const text = results.map((doc, i) => [
+      `---\n### ${i + 1}. ${doc.title} (${doc.path})`,
+      doc.bestSection.heading ? `#### Section: ${doc.bestSection.heading}` : "",
+      doc.bestSection.md || ""
+    ].filter(Boolean).join("\n")).join("\n");
+
+    return { content: [{ type: "text", text: `**${results.length} result(s) for:** "${query}"
+${text}` }] };
   }
 );
 
