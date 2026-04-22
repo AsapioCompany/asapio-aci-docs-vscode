@@ -16,11 +16,49 @@ import { z } from "zod";
 import { parse } from "node-html-parser";
 import https from "https";
 import http from "http";
+import fs from "fs";
+import path from "path";
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 
 const DOCS_BASE_URL = (process.env.DOCS_BASE_URL || "https://asapio.com/docs").replace(/\/$/, "");
 const CACHE_TTL_MS  = parseInt(process.env.CACHE_TTL_SECONDS || "3600") * 1000; // default: 1 hour
+const LOCAL_DOCS_DIR = path.resolve(process.cwd(), "../docs");
+// ─── Local Docs Helpers ─────────────────────────────────────────────────────
+
+function listLocalDocs() {
+  if (!fs.existsSync(LOCAL_DOCS_DIR)) return [];
+  return fs.readdirSync(LOCAL_DOCS_DIR)
+    .filter(f => f.endsWith(".html"))
+    .map(f => path.join(LOCAL_DOCS_DIR, f));
+}
+
+function readLocalDoc(docPath) {
+  const fullPath = path.isAbsolute(docPath)
+    ? docPath
+    : path.join(LOCAL_DOCS_DIR, docPath.replace(/^\/+/, ""));
+  if (fs.existsSync(fullPath)) {
+    let html = fs.readFileSync(fullPath, "utf-8");
+    // Embed images as base64
+    html = html.replace(/<img\s+[^>]*src=["']([^"']+)["'][^>]*>/gi, (match, src) => {
+      // Only embed relative images (not http/https/data)
+      if (/^(https?:|data:)/i.test(src)) return match;
+      // Resolve image path relative to doc file
+      const imgPath = path.resolve(path.dirname(fullPath), src);
+      if (fs.existsSync(imgPath)) {
+        const ext = path.extname(imgPath).slice(1).toLowerCase();
+        const mime = ext === "svg" ? "image/svg+xml" : `image/${ext}`;
+        const data = fs.readFileSync(imgPath);
+        const base64 = data.toString("base64");
+        const dataUrl = `data:${mime};base64,${base64}`;
+        return match.replace(src, dataUrl);
+      }
+      return match;
+    });
+    return html;
+  }
+  return null;
+}
 
 // ─── HTTP helpers ─────────────────────────────────────────────────────────────
 
@@ -135,10 +173,22 @@ function parseDoc(html, url) {
 async function buildIndex(force = false) {
   if (indexCache && isFresh(indexCache.builtAt) && !force) return indexCache.pages;
 
+  // Prefer local docs if available
+  const localFiles = listLocalDocs();
+  if (localFiles.length > 0) {
+    const pages = localFiles.map(f => {
+      const html = readLocalDoc(f);
+      // Use file name as path
+      const url = `file://${f}`;
+      return parseDoc(html, url);
+    });
+    indexCache = { pages, builtAt: Date.now() };
+    return pages;
+  }
+  // Otherwise fallback to online
   const indexHtml = await fetchCached(DOCS_BASE_URL + "/");
   const links     = extractDocLinks(indexHtml, DOCS_BASE_URL + "/");
   const unique    = [...new Set([DOCS_BASE_URL + "/", ...links])];
-
   // Fetch in parallel, max 8 concurrent requests
   const pages = [];
   for (let i = 0; i < unique.length; i += 8) {
@@ -148,7 +198,6 @@ async function buildIndex(force = false) {
     );
     results.forEach((r) => { if (r.status === "fulfilled") pages.push(r.value); });
   }
-
   indexCache = { pages, builtAt: Date.now() };
   return pages;
 }
@@ -178,9 +227,27 @@ async function searchDocs(query, limit = 5) {
     .slice(0, limit);
 }
 
+
 // ─── MCP Server ───────────────────────────────────────────────────────────────
 
 const server = new McpServer({ name: "mcp-aci-docs", version: "2.0.0" });
+
+// ── allow_online_fallback ─────────────────────────────────────────────────---
+server.tool(
+  "allow_online_fallback",
+  "Ask the user for permission to fetch a documentation page from the website if not found locally.",
+  {
+    docPath: z.string().describe("The documentation path or name requested by the user."),
+  },
+  async ({ docPath }) => {
+    return {
+      content: [{
+        type: "text",
+        text: `The documentation page '${docPath}' was not found locally. Do you want to fetch it from the website? (yes/no)`
+      }]
+    };
+  }
+);
 
 // ── search_docs ───────────────────────────────────────────────────────────────
 server.tool(
@@ -214,9 +281,22 @@ server.tool(
   {
     path: z.string().describe("Path or full URL, e.g. 'getting-started.html' or 'https://asapio.com/docs/setup.html'"),
   },
-  async ({ path: docPath }) => {
-    const url  = docPath.startsWith("http") ? docPath : `${DOCS_BASE_URL}/${docPath.replace(/^\//, "")}`;
-    const html = await fetchCached(url);
+  async ({ path: docPath }, { tools }) => {
+    // Try local first
+    let html = readLocalDoc(docPath);
+    let url = docPath;
+    if (!html) {
+      // Use MCP tool to ask user for permission
+      if (tools && tools.allow_online_fallback) {
+        const resp = await tools.allow_online_fallback({ docPath });
+        const answer = (resp && resp.content && resp.content[0] && resp.content[0].text) ? resp.content[0].text.trim().toLowerCase() : "";
+        if (!/^y(es)?$/.test(answer)) {
+          return { content: [{ type: "text", text: `Cancelled. '${docPath}' not fetched from website.` }] };
+        }
+      }
+      url  = docPath.startsWith("http") ? docPath : `${DOCS_BASE_URL}/${docPath.replace(/^\//, "")}`;
+      html = await fetchCached(url);
+    }
     const doc  = parseDoc(html, url);
     const text = [`# ${doc.title}`, doc.url, doc.description ? `> ${doc.description}` : "", "", doc.content]
       .filter((l) => l !== "").join("\n");

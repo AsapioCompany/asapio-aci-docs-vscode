@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Frequently asked questions about ASAPIO Integration Add-on – performance, event triggers, and configuration." name="description"/>
+<title>FAQ – ASAPIO Docs</title>
+<link href="https://www.asapio.com/docs/faq/index.html" hreflang="en" rel="alternate"/>
+<link href="https://www.asapio.com/docs/faq/index.html" hreflang="x-default" rel="alternate"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'&gt;&lt;rect width='32' height='32' rx='7' fill='%23d25b51'/&gt;&lt;text y='23' x='5' font-size='19' font-family='sans-serif' font-weight='bold' fill='white'&gt;A&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+</head>
+<body>
+
+
+<div>
+
+<main id="docs-content">
+<p>Reference</p>
+<h1>FAQ</h1>
+<div>
+<p>Common questions from ASAPIO customers and integration engineers – covering initial setup, connector configuration, payload design, error handling and licensing. If your question isn't answered here, open a ticket via the <a href="../support/index.html">Support Portal</a>.</p>
+</div>
+<p>Answers to the most common questions – from first-time setup to advanced feature configuration.</p>
+<h2 id="getting-started">Getting Started</h2>
+<details>
+<summary>What is the ASAPIO Integration Add-on?</summary>
+<div>
+<p>The ASAPIO Integration Add-on is a native SAP ABAP add-on that enables event-driven and batch integration between SAP systems (S/4HANA, ECC) and cloud platforms such as Microsoft Azure, AWS, Kafka, Solace, Google Pub/Sub, and more. It installs directly into the SAP system – no middleware or additional server is required. Events are triggered by standard SAP Business Object events and sent to the configured cloud endpoint.</p>
+</div>
+</details>
+<details>
+<summary>Which SAP systems are supported?</summary>
+<div>
+<p>The ASAPIO Integration Add-on supports:</p>
+<ul>
+<li>SAP S/4HANA (on-premise and Private Cloud Edition)</li>
+<li>SAP ECC (ERP 6.0, EhP 7+)</li>
+<li>SAP NetWeaver 7.31 and higher (minimum ABAP stack)</li>
+</ul>
+<p>For full system requirements see the <a href="../installation/index.html">Installation &amp; Setup</a> guide.</p>
+</div>
+</details>
+<details>
+<summary>Do I need ABAP development skills to use ASAPIO?</summary>
+<div>
+<p>Not for standard use cases. The Payload Designer, Event Studio, and the SPRO customising guide let you configure payload structures, event linkages, and connector settings without writing ABAP code. Functional consultants and basis administrators can set up and operate most integrations.</p>
+<p>ABAP knowledge is only needed if you want to implement custom BAdI extensions or write your own formatter/extractor function modules.</p>
+</div>
+</details>
+<details>
+<summary>How long does a typical first integration take to set up?</summary>
+<div>
+<p>A standard integration (e.g. sending a Sales Order event to Azure Service Bus) typically takes a few hours from transport import to first successful message. The steps are:</p>
+<ol>
+<li>Install the transport (<a href="../installation/index.html">Installation guide</a>)</li>
+<li>Create an RFC destination and cloud instance for your connector</li>
+<li>Create or import a payload design (or pick one from the Integration Catalog)</li>
+<li>Create the outbound object and link it to a SAP Business Object event</li>
+<li>Test with a trace-enabled run and verify in the ASAPIO Monitor</li>
+</ol>
+</div>
+</details>
+<details>
+<summary>What is a cloud instance?</summary>
+<div>
+<p>A cloud instance (configured in <code>/ASADEV/ACI_SETTINGS</code> via SPRO) is the ASAPIO record that groups the connection settings for one cloud endpoint – the RFC destination, authentication type, and default values like topic names or queue names. You can have multiple cloud instances pointing to different targets (e.g. one for production, one for dev/test).</p>
+</div>
+</details>
+<details>
+<summary>What is the Integration Catalog?</summary>
+<div>
+<p>The <a href="../catalog/index.html">Integration Catalog</a> is a downloadable library of 212 pre-built integration items covering the most common SAP business events across all major Lines of Business (Sales, Procurement, Production, Finance, Logistics, Quality Management, and more). Each item contains a predefined payload design and event linkage that you can import and activate immediately – or use as a starting point for customisation.</p>
+</div>
+</details>
+<h2 id="installation">Installation &amp; Licensing</h2>
+<details>
+<summary>What are the minimum system requirements?</summary>
+<div>
+<p>See the <a href="../installation/index.html">Installation &amp; Setup</a> page for full details, including minimum SAP basis release, required support packages, and the import sequence for transport requests. In general: SAP NetWeaver 7.31+, SAP_BASIS 731 SP10+, HTTP connectivity from the SAP system to the cloud endpoint.</p>
+</div>
+</details>
+<details>
+<summary>What is the difference between the ASAPIO Integration Add-on and the SAP OEM editions?</summary>
+<div>
+<p>ASAPIO offers the same technology in multiple editions:</p>
+<ul>
+<li><strong>ASAPIO Integration Add-on</strong> – direct ASAPIO license, full connector library</li>
+<li><strong>SAP Event Add-On for ERP</strong> – OEM edition for SAP Advanced Event Mesh (SAP BTP), licensed by SAP</li>
+<li><strong>SAP NetWeaver Event-enablement Add-on</strong> – OEM edition for SAP Event Mesh (SAP BTP)</li>
+<li><strong>SAP Fieldglass Integration Add-on</strong> – OEM edition for Fieldglass ERP integration</li>
+</ul>
+<p>The OEM editions are obtained through SAP and have their own support components (OPU-ASA-AEM, OPU-ASA-EE, OPU-ASA-FG). See <a href="../support/index.html">Support</a> for the correct channel per edition.</p>
+</div>
+</details>
+<h2 id="connectors">Connectors &amp; Connectivity</h2>
+<details>
+<summary>Which cloud platforms are supported?</summary>
+<div>
+<p>ASAPIO has certified connectors for: Microsoft Azure (Service Bus, Event Hub, Event Grid, ADLS Gen2), Microsoft Fabric (OneLake, Open Mirroring), Solace PubSub+, Confluent, Apache Kafka, SAP Advanced Event Mesh, Google Cloud Pub/Sub, Amazon Web Services (EventBridge, SNS, Kinesis, S3), StreamSets, mysupply, SAP Ariba, and AI Vergabemanager.</p>
+<p>See the full <a href="../connectors/index.html">Connectors overview</a> for details on each.</p>
+</div>
+</details>
+<details>
+<summary>Can I connect to a platform that is not on the standard connector list?</summary>
+<div>
+<p>Yes. The <strong>Custom HTTP</strong> connector allows you to send messages to any HTTP/HTTPS REST endpoint. You configure the target URI in the cloud instance and the integration sends the payload as a standard HTTP POST. This covers most REST APIs that accept JSON payloads.</p>
+</div>
+</details>
+<details>
+<summary>Can I run multiple connectors at the same time?</summary>
+<div>
+<p>Yes. You can have any number of cloud instances, each pointing to a different platform or a different endpoint on the same platform. A single outbound object can send to one instance, and you can create multiple outbound objects for the same SAP event if you need fan-out to multiple targets.</p>
+</div>
+</details>
+<details>
+<summary>Where are connector credentials stored?</summary>
+<div>
+<p>Secrets (API keys, client secrets, passwords) are stored in the ASAPIO secure credential store: table <code>/ASADEV/SCI_TPW</code>, accessed via SPRO → "Set the cloud connection password". Credentials never appear in plain text in customising tables. OAuth tokens are fetched at runtime and cached in memory.</p>
+</div>
+</details>
+<h2 id="outbound">Outbound Messaging</h2>
+<details>
+<summary>What is the difference between real-time event mode and batch mode?</summary>
+<div>
+<p><strong>Real-time (event-driven):</strong> A SAP Business Object event (e.g. <code>BUS2032 CHANGED</code> for Sales Orders) triggers the outbound message immediately when the object is saved. Best for individual transactions requiring near-real-time delivery.</p>
+<p><strong>Batch mode:</strong> A scheduled background job (report <code>/ASADEV/ACI_BATCH_SEND</code> or similar) extracts a set of records and sends them in one job run. Best for bulk data loads, delta extracts, or cases where real-time triggers would create excessive load.</p>
+<p><strong>Packed Load:</strong> A variant of batch mode that uses multiple parallel work processes for high-volume transfers. See the Performance question below.</p>
+</div>
+</details>
+<details>
+<summary>How do I find out which SAP events are available for a given Business Object?</summary>
+<div>
+<p>Use transaction <strong>SWE2</strong> (Event Type Linkage) to browse available Business Object types and their events. You can also use transaction <strong>SWO1</strong> to inspect a Business Object and its events directly. The ASAPIO Integration Catalog lists the most common ones with ready-to-use configurations. See also <a href="../outbound/index.html">Outbound Messaging – How to identify event triggers</a>.</p>
+</div>
+</details>
+<details>
+<summary>How do I define which fields are included in the message payload?</summary>
+<div>
+<p>Use the <a href="../designer/index.html">Payload Designer</a> (transaction <code>/ASADEV/DESIGN</code>). You select the SAP database tables or CDS views, join them in the visual Join Builder, and choose which fields to include. The designer outputs JSON at runtime – no ABAP coding required. You can also add custom fields, apply conversion classes, set default values, and skip fields conditionally.</p>
+</div>
+</details>
+<details>
+<summary>Can I filter which records get sent?</summary>
+<div>
+<p>Yes. In the Payload Designer, open the version screen and add a WHERE condition (filter string) to restrict which records are extracted. For example, you can filter by company code, sales organisation, plant, or any field in the joined tables. Filters use standard ABAP Open SQL WHERE clause syntax.</p>
+</div>
+</details>
+<details>
+<summary>What are the different outbound message types?</summary>
+<div>
+<ul>
+<li><strong>Simple Notification</strong> – sends a lightweight JSON notification with key fields only (e.g. document number, change type). Low payload overhead, useful for triggering downstream processes.</li>
+<li><strong>Message Builder (Payload Designer)</strong> – sends a rich JSON payload built from SAP table joins. The standard approach for most integrations.</li>
+<li><strong>Packed Load</strong> – batches many records into a single large message with parallel extraction. Used for high-volume initial loads or delta batch jobs.</li>
+<li><strong>IDoc</strong> – serialises a standard SAP IDoc as JSON and sends it via the cloud connector. Useful for ERP-to-ERP or legacy system integrations.</li>
+</ul>
+<p>See <a href="../outbound/index.html">Outbound Messaging overview</a> for setup steps for each type.</p>
+</div>
+</details>
+<details>
+<summary>What is CloudEvents format and should I use it?</summary>
+<div>
+<p><a href="../cloudevents/index.html">CloudEvents</a> is a CNCF specification for describing event data in a common format. ASAPIO can wrap outbound messages in a CloudEvents envelope (adding standardised attributes like <code>source</code>, <code>type</code>, <code>specversion</code>, <code>id</code>, and <code>time</code>). Use CloudEvents if your target platform or consumer expects the standard envelope, or if you want interoperability across different event sources.</p>
+</div>
+</details>
+<h2 id="performance">Performance &amp; Scale</h2>
+<details>
+<summary>What is the performance impact of real-time event messaging?</summary>
+<div>
+<p>The additional workload per single event for message generation is almost negligible. The HTTP call to the cloud endpoint is asynchronous by default and does not block the SAP update task.</p>
+<p><strong>Important:</strong> Triggers from SAP batch processes (MRP runs, mass goods movements, etc.) should not use real-time event mode. Use batch or packed-load mode instead to avoid flooding the SAP work process pool and the target service.</p>
+</div>
+</details>
+<details>
+<summary>What is Packed Load and when should I use it?</summary>
+<div>
+<p>Packed Load is a high-throughput batch mode that uses multiple parallel SAP work processes (configured via server groups) to extract and send large volumes of data. ASAPIO splits the dataset into chunks and distributes them across work processes.</p>
+<p>Use Packed Load when:</p>
+<ul>
+<li>Sending initial data loads (millions of records)</li>
+<li>Running daily or weekly bulk delta transfers</li>
+<li>MRP runs or mass update scenarios generating thousands of events</li>
+</ul>
+<p>See <a href="../outbound/index.html#packedload">Set-up packed load</a> for configuration details.</p>
+</div>
+</details>
+<h2 id="inbound">Inbound Messaging</h2>
+<details>
+<summary>How does inbound messaging work?</summary>
+<div>
+<p>ASAPIO inbound messaging allows external systems to push data back into SAP. The add-on exposes an inbound endpoint that accepts HTTP requests. Received data is staged as an ASAPIO Generic IDoc (<code>/ASADEV/ACI_GENERIC_IDOC</code>) and then processed via standard SAP IDoc inbound processing (WE20 partner profile, process code, inbound function module). This means all standard SAP IDoc error handling and monitoring applies. See the <a href="../inbound/index.html">Inbound Messaging</a> page for setup steps.</p>
+</div>
+</details>
+<details>
+<summary>Can I poll an external API from SAP instead of waiting for a push?</summary>
+<div>
+<p>Yes. Several connector scenarios (e.g. mysupply, some Kafka setups) use a polling model: a scheduled ASAPIO background job calls the external API at a configured interval, retrieves new data, and processes it via the IDoc staging mechanism. The polling interval is configured via the outbound/inbound object settings.</p>
+</div>
+</details>
+<h2 id="monitoring">Monitoring &amp; Error Handling</h2>
+<details>
+<summary>How do I monitor message delivery?</summary>
+<div>
+<p>The ASAPIO Monitor (transaction <code>/ASADEV/ACI_MONITOR</code> or via SPRO) shows all outbound message attempts with their status (success, error, retry). You can filter by date, cloud instance, outbound object, or status.</p>
+<p>For central monitoring across SAP systems, ASAPIO can push health metrics and exception events to <a href="../monitoring/calm_connectivity/index.html">SAP Cloud ALM</a>.</p>
+</div>
+</details>
+<details>
+<summary>What happens when a message fails to deliver?</summary>
+<div>
+<p>Failed messages are logged in the ASAPIO Monitor with the HTTP response code and error details. The add-on supports configurable automatic retry logic: you define the number of retries and the interval (default: 2 retries). After all retries are exhausted the message remains in <em>Error</em> status and can be manually re-sent from the Monitor once the root cause is resolved.</p>
+</div>
+</details>
+<details>
+<summary>How do I re-send a failed message?</summary>
+<div>
+<p>In the ASAPIO Monitor, select the failed message entry and use the <strong>Re-send</strong> action. You can re-send individual messages or use mass re-send for a selection. Re-sends are independent of the original event – they replay the stored payload without re-extracting from SAP, so the data reflects the state at the time of the original message.</p>
+</div>
+</details>
+<details>
+<summary>How long are message logs and traces retained?</summary>
+<div>
+<p>Retention is controlled by your periodic archiving job using report <code>/ASADEV/ACI_AMRLOG_DELETE</code>. You define the retention period (by date range) in the job parameters. Trace payloads (stored in SAP table STXH) are deleted together with the log entries. There is no fixed system-imposed retention limit – it is your responsibility to archive regularly to avoid table growth.</p>
+</div>
+</details>
+<h2 id="features">Feature-Specific Questions</h2>
+<details>
+<summary>What is Event Studio?</summary>
+<div>
+<p><a href="../eventstudio/index.html">Event Studio</a> is an SAP Fiori web app (running on SAP BTP) that provides a graphical interface for configuring ASAPIO integrations. It lets you create cloud instances, outbound objects, event linkages, and payload designs without using ABAP transactions. It is particularly useful for teams that prefer a visual, browser-based tool over SPRO customising.</p>
+</div>
+</details>
+<details>
+<summary>What is the Payload Designer?</summary>
+<div>
+<p>The <a href="../designer/index.html">Payload Designer</a> (transaction <code>/ASADEV/DESIGN</code>) is a no-code tool for building JSON payload definitions from SAP database tables and CDS views. You join tables visually, select fields, apply conversions, set skip conditions, and preview the resulting JSON – all without writing ABAP. Payload designs are reusable across multiple outbound objects and can be transported between systems.</p>
+</div>
+</details>
+<details>
+<summary>Can I add custom fields to the payload that don't come from the main SAP table?</summary>
+<div>
+<p>Yes, in several ways:</p>
+<ul>
+<li><strong>Join additional tables</strong> in the Payload Designer (e.g. join ADRC for address data, LFA1 for vendor master)</li>
+<li><strong>Add a custom field</strong> with a conversion class/method that computes a value at runtime (e.g. a calculated field, a lookup)</li>
+<li><strong>Use a CDS view</strong> that already combines the required fields</li>
+<li><strong>Implement a BAdI extension</strong> if the logic is too complex for a conversion method</li>
+</ul>
+</div>
+</details>
+<details>
+<summary>Can I export my event definitions as an API specification?</summary>
+<div>
+<p>Yes. ASAPIO supports <a href="../asyncapi/index.html">AsyncAPI 2.0 export</a>. You can generate an AsyncAPI specification from your payload designs, which documents the event channels, message schema, and payload structure in a machine-readable format. This is useful for registering APIs in API catalogues or sharing event contracts with consuming teams.</p>
+</div>
+</details>
+<details>
+<summary>Does ASAPIO support SAP RAP (Restful Application Programming) events?</summary>
+<div>
+<p>Yes. From S/4HANA 2020 onwards, ASAPIO supports the <a href="../rap-events/index.html">RAP Event Linkage Framework</a>. You can react to Business Object events raised by RAP-based objects (e.g. standard S/4HANA APIs) and send them via ASAPIO outbound processing. The Integration Catalog includes pre-built RAP event linkages for the most common S/4HANA objects.</p>
+</div>
+</details>
+<details>
+<summary>Can I send data as an IDoc format over a cloud connector?</summary>
+<div>
+<p>Yes. The <a href="../idoc/index.html">IDoc Messaging</a> feature serialises standard SAP IDocs as JSON and sends them via any configured ASAPIO cloud connector. This is useful for integrating legacy ERP-to-ERP scenarios or existing IDoc-based processes with modern cloud platforms, without changing the SAP-side IDoc configuration.</p>
+</div>
+</details>
+</main>
+<aside id="docs-toc">
+<div>On this page</div>
+<nav><ul>
+<li><a href="#getting-started">Getting Started</a></li>
+<li><a href="#installation">Installation &amp; Licensing</a></li>
+<li><a href="#connectors">Connectors</a></li>
+<li><a href="#outbound">Outbound Messaging</a></li>
+<li><a href="#performance">Performance &amp; Scale</a></li>
+<li><a href="#inbound">Inbound Messaging</a></li>
+<li><a href="#monitoring">Monitoring &amp; Errors</a></li>
+<li><a href="#features">Feature-Specific</a></li>
+</ul></nav>
+</aside>
+</div>
+</body>
+</html>

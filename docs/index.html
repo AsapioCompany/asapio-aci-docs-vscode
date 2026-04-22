@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="ASAPIO Integration Add-on documentation – installation, connector configuration, outbound and inbound messaging, monitoring, and reference." name="description"/>
+<title>Documentation – ASAPIO</title>
+<link href="https://www.asapio.com/docs/index.html" hreflang="en" rel="alternate"/>
+<link href="https://www.asapio.com/de/docs/index.html" hreflang="de" rel="alternate"/>
+<link href="https://www.asapio.com/docs/index.html" hreflang="x-default" rel="alternate"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'&gt;&lt;rect width='32' height='32' rx='7' fill='%23d25b51'/&gt;&lt;text y='23' x='5' font-size='19' font-family='sans-serif' font-weight='bold' fill='white'&gt;A&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+</head>
+<body>
+
+
+<div>
+
+<main id="docs-content">
+<div>
+<p>Integration Add-on · Technical Reference</p>
+<h1>ASAPIO Documentation</h1>
+<p>Everything you need to install, configure and operate the ASAPIO Integration Add-on – the SAP-native ABAP add-on for event-driven SAP cloud integration.</p>
+<div>
+<svg fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+<input id="docs-hero-search" placeholder="Search documentation…" type="text"/>
+</div>
+<div>
+<a href="installation/index.html">Quick Start →</a>
+<a href="connectors/index.html">Browse Connectors</a>
+</div>
+</div>
+<section id="quick-start">
+<h2>Quick start – your first integration in 4 steps</h2>
+<div>
+<a href="installation/index.html">
+<div>1</div>
+<div>Install</div>
+<p>Import the transport request, configure roles, and activate the BC-Set in your SAP system.</p>
+<span>Installation guide →</span>
+</a>
+<div aria-hidden="true">
+<svg fill="none" height="20" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="20"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</div>
+<a href="connectors/index.html">
+<div>2</div>
+<div>Connect</div>
+<p>Create the RFC destination and configure a cloud instance for your target platform.</p>
+<span>Choose a connector →</span>
+</a>
+<div aria-hidden="true">
+<svg fill="none" height="20" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="20"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</div>
+<a href="outbound/index.html">
+<div>3</div>
+<div>Configure Events</div>
+<p>Design the payload, link SAP business events to the outbound object, and activate.</p>
+<span>Outbound messaging →</span>
+</a>
+<div aria-hidden="true">
+<svg fill="none" height="20" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="20"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</div>
+<a href="monitoring/index.html">
+<div>4</div>
+<div>Monitor</div>
+<p>Track delivery, inspect message traces, and handle errors in the ASAPIO Monitor.</p>
+<span>Monitor &amp; traces →</span>
+</a>
+</div>
+</section>
+<section id="topics">
+<h2>Explore by topic</h2>
+<div>
+<div>
+<span>🚀</span>
+<span>Getting Started</span>
+</div>
+<div>
+<a href="installation/index.html">
+<span>Installation &amp; Setup</span>
+<span>System requirements, transport import, roles and uninstallation.</span>
+</a>
+<a href="catalog/index.html">
+<span>Integration Catalog</span>
+<span>212 pre-built event definitions across all SAP Lines of Business.</span>
+</a>
+<a href="eventstudio/index.html">
+<span>Event Studio</span>
+<span>Fiori app for configuring integrations without coding.</span>
+</a>
+<a href="transport/index.html">
+<span>Configuration Transport</span>
+<span>Move ASAPIO customizing across SAP system landscapes.</span>
+</a>
+</div>
+</div>
+<div>
+<div>
+<span>📤</span>
+<span>Outbound Messaging</span>
+</div>
+<div>
+<a href="outbound/index.html">
+<span>Overview</span>
+<span>Batch jobs, retry logic, packed load extractor, and outbound object setup.</span>
+</a>
+<a href="designer/index.html">
+<span>Payload Designer</span>
+<span>Design JSON payloads from SAP tables and CDS views – no ABAP code required.</span>
+</a>
+<a href="cds-view-support/index.html">
+<span>CDS View Support</span>
+<span>Use released CDS views and custom views as data sources.</span>
+</a>
+<a href="cloudevents/index.html">
+<span>CloudEvents Format</span>
+<span>Produce CNCF CloudEvents-compliant message envelopes.</span>
+</a>
+<a href="idoc/index.html">
+<span>IDoc Messaging</span>
+<span>Send SAP IDocs as JSON over any cloud connector.</span>
+</a>
+<a href="rap-events/index.html">
+<span>RAP Events</span>
+<span>React to S/4HANA Business Object events via the RAP framework.</span>
+</a>
+<a href="atp/index.html">
+<span>Real-Time ATP</span>
+<span>Push inventory and availability-to-promise data in real time.</span>
+</a>
+<a href="sequencing/index.html">
+<span>Message Sequencing</span>
+<span>Guarantee ordered delivery of related SAP events.</span>
+</a>
+<a href="asyncapi/index.html">
+<span>AsyncAPI Export</span>
+<span>Export event schemas as AsyncAPI 2.0 specifications.</span>
+</a>
+</div>
+</div>
+<div>
+<div>
+<span>📥</span>
+<span>Inbound Messaging</span>
+</div>
+<div>
+<a href="inbound/index.html">
+<span>Inbound Overview</span>
+<span>Receive events from external systems into SAP via IDoc staging and inbound APIs.</span>
+</a>
+</div>
+</div>
+<div>
+<div>
+<span>📊</span>
+<span>Monitoring &amp; Operations</span>
+</div>
+<div>
+<a href="monitoring/index.html">
+<span>Monitor &amp; Traces</span>
+<span>Message traces, error handling, re-send, and alerting for administrators.</span>
+</a>
+<a href="monitoring/calm_connectivity/index.html">
+<span>SAP Cloud ALM</span>
+<span>Health and exception monitoring via Cloud ALM APIs.</span>
+</a>
+<a href="faq/index.html">
+<span>FAQ</span>
+<span>Common questions on performance, configuration, and compatibility.</span>
+</a>
+<a href="gdpr-functions/index.html">
+<span>GDPR Functions</span>
+<span>Data subject rights, deletion reports, and data portability.</span>
+</a>
+<a href="support/index.html">
+<span>Support Portal</span>
+<span>Open a support ticket with our engineering and support team.</span>
+</a>
+</div>
+</div>
+</section>
+<section id="connectors">
+<h2>Supported Connectors</h2>
+<div>
+<a href="connectors/azure/index.html">
+<span>Microsoft Azure</span>
+<span>Service Bus · Event Hub · Event Grid · ADLS</span>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="14"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</a>
+<a href="connectors/fabric/index.html">
+<span>Microsoft Fabric</span>
+<span>OneLake · Open Mirroring</span>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="14"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</a>
+<a href="connectors/solace/index.html">
+<span>Solace PubSub+</span>
+<span>REST · AMQP</span>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="14"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</a>
+<a href="connectors/confluent/index.html">
+<span>Confluent</span>
+<span>Kafka REST Proxy · Native Kafka</span>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="14"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</a>
+<a href="connectors/kafka/index.html">
+<span>Apache Kafka</span>
+<span>Generic Kafka REST Proxy</span>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="14"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</a>
+<a href="connectors/sap-aem/index.html">
+<span>SAP Advanced Event Mesh</span>
+<span>REST · AMQP</span>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="14"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</a>
+<a href="connectors/google/index.html">
+<span>Google Cloud Pub/Sub</span>
+<span>Service Account (JWT)</span>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="14"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</a>
+<a href="connectors/aws/index.html">
+<span>Amazon Web Services</span>
+<span>EventBridge · SNS · Kinesis · S3</span>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="14"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</a>
+<a href="connectors/streamsets/index.html">
+<span>StreamSets</span>
+<span>Data Collector REST API</span>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="14"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</a>
+<a href="connectors/mysupply/index.html">
+<span>mysupply</span>
+<span>Procurement · API Key</span>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="14"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</a>
+<a href="connectors/ariba/index.html">
+<span>SAP Ariba</span>
+<span>OAuth2</span>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="14"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</a>
+<a href="connectors/ai-vm/index.html">
+<span>AI Vergabemanager</span>
+<span>API Key</span>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24" width="14"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+</a>
+</div>
+</section>
+</main>
+</div>
+</body>
+</html>

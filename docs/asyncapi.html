@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Export AsyncAPI specifications for ASAPIO Integration Add-on interfaces to use in API management solutions." name="description"/>
+<title>AsyncAPI Export – ASAPIO Docs</title>
+<link href="https://www.asapio.com/docs/asyncapi/index.html" hreflang="en" rel="alternate"/>
+<link href="https://www.asapio.com/docs/asyncapi/index.html" hreflang="x-default" rel="alternate"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'&gt;&lt;rect width='32' height='32' rx='7' fill='%23d25b51'/&gt;&lt;text y='23' x='5' font-size='19' font-family='sans-serif' font-weight='bold' fill='white'&gt;A&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+</head>
+<body>
+
+
+<div>
+
+<main id="docs-content">
+<p>Reference</p>
+<h1>AsyncAPI® Support</h1>
+<div>
+<p>Export a machine-readable AsyncAPI specification for your ASAPIO integration scenarios – describing channels, message schemas and platform bindings. Ready for use in API portals, contract tests, code generation and developer self-service tooling.</p>
+</div>
+<h2 id="overview">Overview</h2>
+<p>AsyncAPI provides a standard for defining event-driven APIs using asynchronous messaging. It is used by various tools to increase interoperability.</p>
+<p>By providing an AsyncAPI export for interfaces configured in the ASAPIO Integration Add-on, the events from the SAP system can be easily integrated into API management solutions. These solutions serve as a central documentation hub for the available APIs in an architecture. The export makes it easy to get a correct schema definition of the configured payload structure and can combine it with the information of the target topic/queue/endpoint.</p>
+<p><strong>Note:</strong> New feature in release 9.32304. All interfaces defining the payload using DB/CDS views or the Payload Designer are supported. Interfaces using custom extractors / formatters or notification events are currently not supported.</p>
+<h2 id="export">Export AsyncAPI Specification</h2>
+<p>To export an AsyncAPI specification for your interfaces:</p>
+<figure>
+<img alt="AsyncAPIExport Screen" loading="lazy" src="img/asyncapi/6zya0g1evf8gf72t.png" width="900"/>
+<figcaption>AsyncAPIExport Screen</figcaption>
+</figure>
+<ul>
+<li><strong>Transaction:</strong> SA38</li>
+<li><strong>Report:</strong> <code>/ASADEV/ACI_ASYNCAPI_EXPORT</code></li>
+</ul>
+<p>Specify the following parameters:</p>
+<ul>
+<li><strong>Cloud Instance:</strong> The target system for which to generate the specification</li>
+<li><strong>Outbound Object:</strong> Optional – if empty, all configured interfaces are exported</li>
+<li><strong>Title:</strong> A name for the AsyncAPI specification</li>
+<li><strong>Version:</strong> Version string for the generated AsyncAPI specification</li>
+<li><strong>Path / filename:</strong> Where to save the generated specification file</li>
+</ul>
+<p>The export provides a file containing the specification for the selected interfaces. You can import this file into other tools supporting AsyncAPI.</p>
+</main>
+<aside id="docs-toc">
+<div>On this page</div>
+<nav><ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#export">Export AsyncAPI Specification</a></li>
+</ul></nav>
+</aside>
+</div>
+</body>
+</html>

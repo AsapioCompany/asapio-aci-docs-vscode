@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Transport ASAPIO customizing configuration tables between SAP systems using SE09 and SCC1." name="description"/>
+<title>Configuration Transport – ASAPIO Docs</title>
+<link href="https://www.asapio.com/docs/transport/index.html" hreflang="en" rel="alternate"/>
+<link href="https://www.asapio.com/docs/transport/index.html" hreflang="x-default" rel="alternate"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'&gt;&lt;rect width='32' height='32' rx='7' fill='%23d25b51'/&gt;&lt;text y='23' x='5' font-size='19' font-family='sans-serif' font-weight='bold' fill='white'&gt;A&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+</head>
+<body>
+
+
+<div>
+
+<main id="docs-content">
+<p>Getting Started</p>
+<h1>Configuration Transport</h1>
+<div>
+<p>How to package your ASAPIO configuration – cloud instances, outbound objects, payload designs – as an SAP transport request for controlled promotion from development through quality to production.</p>
+</div>
+<h2 id="overview">Overview</h2>
+<p>ASAPIO customizing tables are client-dependent and are <strong>not automatically recorded</strong> in change requests by the standard SAP transport system. To move ASAPIO configuration between systems (Development → QA → Production), you need to manually add the relevant table entries to a transport request.</p>
+<h2 id="config-tables">Configuration Tables</h2>
+<p>The following ASAPIO configuration tables must be manually transported:</p>
+<h3>Connection &amp; Event Configuration</h3>
+<table>
+<thead><tr><th>Table</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>/ASADEV/AMR_EVEN</code></td><td>Load Events (Fieldglass, SAP Event Mesh)</td></tr>
+<tr><td><code>/ASADEV/ACI_ADPT</code></td><td>Cloud Adapter (FG_CON_N, WS_IN, SAP_EM)</td></tr>
+<tr><td><code>/ASADEV/AMR_CODE</code></td><td>Codepages</td></tr>
+<tr><td><code>/ASADEV/AMR_CONN</code></td><td>Cloud Instance (connection definitions)</td></tr>
+<tr><td><code>/ASADEV/ACI_SHDE</code></td><td>Attributes per Cloud Instance</td></tr>
+<tr><td><code>/ASADEV/ACI_CNST</code></td><td>Definition of Global Functions</td></tr>
+<tr><td><code>/ASADEV/ACI_GLOB</code></td><td>Activation of Global Functions / Constants</td></tr>
+<tr><td><code>/ASADEV/ACI_DEFA</code></td><td>Default values</td></tr>
+<tr><td><code>/ASADEV/ACI_EMAP</code></td><td>Handling of Return codes / Error messages</td></tr>
+<tr><td><code>/ASADEV/AMR_OBJ</code></td><td>Outbound Objects</td></tr>
+<tr><td><code>/ASADEV/ACI_HATT</code></td><td>Header Attributes of Replication Objects</td></tr>
+<tr><td><code>/ASADEV/ACI_XML</code></td><td>XML Mapping fields</td></tr>
+<tr><td><code>/ASADEV/AMR_OB_I</code></td><td>Inbound Objects</td></tr>
+<tr><td><code>/ASADEV/ACI_MDOC</code></td><td>Inbound Object field mapping</td></tr>
+<tr><td><code>/ASADEV/ACI_FGUN</code></td><td>Unit of Measurement conversion FG ↔ SAP</td></tr>
+<tr><td><code>/ASADEV/ACI_FGPL</code></td><td>Relevant plants for SAP Fieldglass</td></tr>
+<tr><td><code>/ASADEV/ACI_FGRM</code></td><td>Role Mapping</td></tr>
+<tr><td><code>/ASADEV/ACI_FGCC</code></td><td>Relevant company codes for SAP Fieldglass</td></tr>
+<tr><td><code>/ASADEV/ACI_ARCC</code></td><td>Company codes (Support Package 01, Feature Pack 1 and 2 only)</td></tr>
+<tr><td><code>/ASADEV/DATA_EVE</code></td><td>Event Studio – Event Definitions</td></tr>
+</tbody>
+</table>
+<h3>Payload Design Tables</h3>
+<table>
+<thead><tr><th>Table</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>/ASADEV/DYN_VIEW</code></td><td>Payload Designer view definitions</td></tr>
+<tr><td><code>/ASADEV/DYN_VERS</code></td><td>Payload Designer versions</td></tr>
+<tr><td><code>/ASADEV/DBJT_INP</code></td><td>Join table input</td></tr>
+<tr><td><code>/ASADEV/DBJC_INP</code></td><td>Join condition input</td></tr>
+<tr><td><code>/ASADEV/DYN_FLDS</code></td><td>Field selections</td></tr>
+<tr><td><code>/ASADEV/DBAN_INP</code></td><td>Annotation input</td></tr>
+<tr><td><code>/ASADEV/ACI_PD_S</code></td><td>Payload Design status settings</td></tr>
+<tr><td><code>/ASADEV/ACI_PD_U</code></td><td>Payload Design user settings</td></tr>
+</tbody>
+</table>
+<h2 id="create-transport">Creating a Transport Request</h2>
+<p>Use transaction <strong>SE09</strong> (Workbench Organizer) to create a transport request and add the configuration table entries:</p>
+<ol>
+<li>Create a new Customizing request in SE09</li>
+<li>Add the relevant table entries using object type <code>R3TR</code> / <code>TABU</code></li>
+<li>For each table, specify the table name and the key fields of the rows to include</li>
+<li>Release the transport request when all entries are added</li>
+<li>Import to the target system via STMS</li>
+</ol>
+<h2 id="multi-client">Multi-Client Transport (SCC1)</h2>
+<p>If configuration needs to be copied across clients within the same system, use transaction <strong>SCC1</strong>:</p>
+<ol>
+<li>In SCC1, select the <strong>source client</strong></li>
+<li>Enter the <strong>transport request number</strong></li>
+<li>Enable <strong>Start Immediately</strong></li>
+<li>Execute to import the request into the current client</li>
+</ol>
+<h2 id="first-time">First-Time Transport Procedure</h2>
+<p>When transporting ASAPIO configuration to a new target system for the first time, move <strong>all workbench and customizing requests</strong> together. This ensures that BC-set auto-configuration and all manual configuration entries are available in the target system.</p>
+<ol>
+<li>Ensure the ASAPIO software package has been imported into the target system</li>
+<li>Check that all required RFC destinations exist in the target system</li>
+<li>Import the configuration transport via STMS</li>
+<li>Verify connection instances and outbound objects are active in the target client</li>
+<li>Run a test from <code>/n/ASADEV/ACI_MONITOR</code> to confirm successful operation</li>
+</ol>
+</main>
+<aside id="docs-toc">
+<div>On this page</div>
+<nav><ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#config-tables">Configuration Tables</a></li>
+<li><a href="#create-transport">Creating a Transport</a></li>
+<li><a href="#multi-client">Multi-Client (SCC1)</a></li>
+<li><a href="#first-time">First-Time Procedure</a></li>
+</ul></nav>
+</aside>
+</div>
+</body>
+</html>

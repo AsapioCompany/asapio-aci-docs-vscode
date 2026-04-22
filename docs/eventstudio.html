@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="ASAPIO Event Studio – web-based SAP UI5 app for configuring and deploying event-driven integrations on SAP BTP or ABAP server." name="description"/>
+<title>Event Studio – ASAPIO Docs</title>
+<link href="https://www.asapio.com/docs/eventstudio/index.html" hreflang="en" rel="alternate"/>
+<link href="https://www.asapio.com/docs/eventstudio/index.html" hreflang="x-default" rel="alternate"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'&gt;&lt;rect width='32' height='32' rx='7' fill='%23d25b51'/&gt;&lt;text y='23' x='5' font-size='19' font-family='sans-serif' font-weight='bold' fill='white'&gt;A&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+</head>
+<body>
+
+
+<div>
+
+<main id="docs-content">
+<p>Getting Started</p>
+<h1>Event Studio</h1>
+<div>
+<p>A no-ABAP Fiori app for day-to-day integration administration – create cloud instances, activate outbound objects and adjust settings without back-end customizing. Designed for functional consultants and integration admins who don't write ABAP.</p>
+</div>
+<p>ASAPIO Event Studio is a web-based SAP UI5 application for configuring and managing event-driven integrations. It can connect to multiple SAP back-end systems simultaneously via SAP BTP destinations with principal propagation, and is deployed either on SAP BTP (Cloud Foundry) or directly on your ABAP server. The minimum ASAPIO version required is <strong>9.32504 (SP11)</strong>.</p>
+<h2 id="overview">Overview</h2>
+<p>Event Studio runs as a standalone SAP UI5 application. Depending on your deployment choice, it is accessible from the SAP BTP Launchpad or directly via your ABAP server URL. All configuration changes made in Event Studio are written to the same ABAP customizing tables used by the classic transactions, keeping both interfaces in sync.</p>
+<figure>
+<img alt="Start screen – system selection" loading="lazy" src="img/eventstudio/h2gv7gql1rirwvfq.png" width="900"/>
+<figcaption>Start screen – system selection</figcaption>
+</figure>
+<figure>
+<img alt="Start screen – active elements" loading="lazy" src="img/eventstudio/ansb8n5zwp65ub1b.png" width="900"/>
+<figcaption>Start screen – active elements</figcaption>
+</figure>
+<p>Event Studio is organized into the following pages:</p>
+<table>
+<thead><tr><th>Page</th><th>Functionality</th></tr></thead>
+<tbody>
+<tr><td><strong>Data Catalog</strong></td><td>Browse available standard and custom data objects; deploy events; view AsyncAPI schema</td></tr>
+<tr><td><strong>Interfaces</strong></td><td>View, create, transport, and export AsyncAPI schema for existing interfaces</td></tr>
+<tr><td><strong>Events</strong></td><td>List predefined events – add, update, or delete event definitions</td></tr>
+<tr><td><strong>Connections</strong></td><td>View configured connections; edit connection settings via SAP GUI for HTML</td></tr>
+<tr><td><strong>Monitoring</strong></td><td>Monitor system activity; filter by timestamp; view and download traces</td></tr>
+<tr><td><strong>Help</strong></td><td>Links to documentation and guidelines</td></tr>
+</tbody>
+</table>
+<h2 id="data-catalog">Data Catalog</h2>
+<p>The <strong>Data Catalog</strong> page lists all available standard and custom data objects. Each object is shown as a tile with key details – Package, Object name, Event ID, and Domain. From a tile you can:</p>
+<ul>
+<li>Open the <strong>Details Page</strong> to inspect the object's full configuration and event list.</li>
+<li>Click the <strong>Deploy</strong> button to open the Deployment Page, where you select a target connector and activate the interface.</li>
+<li>Download the AsyncAPI schema for the selected data object.</li>
+</ul>
+<figure>
+<img alt="Data Catalog – list of standard data objects" loading="lazy" src="img/eventstudio/dt6uwpmgbbu8bkli.png" width="900"/>
+<figcaption>Data Catalog – list of standard data objects</figcaption>
+</figure>
+<figure>
+<img alt="Data Catalog – details page" loading="lazy" src="img/eventstudio/fonu1zt674wvy5b4.png" width="900"/>
+<figcaption>Data Catalog – details page</figcaption>
+</figure>
+<figure>
+<img alt="Data Catalog – deployment page" loading="lazy" src="img/eventstudio/g7p61ng86spqsne2.png" width="900"/>
+<figcaption>Data Catalog – deployment page</figcaption>
+</figure>
+<h2 id="interfaces">Interfaces</h2>
+<p>The <strong>Interfaces</strong> page shows all configured outbound integrations. Each row corresponds to an active interface between ASAPIO and a target connector. The toolbar provides:</p>
+<ul>
+<li><strong>Create</strong> – set up a new interface step by step</li>
+<li><strong>Transport</strong> – add selected interfaces to an ABAP transport request via the Transport Dialog</li>
+<li><strong>AsyncAPI Schema</strong> – export the AsyncAPI specification for the selected interface</li>
+</ul>
+<figure>
+<img alt="Interfaces – table view" loading="lazy" src="img/eventstudio/qhl7orkqod11lqzt.png" width="900"/>
+<figcaption>Interfaces – table view</figcaption>
+</figure>
+<figure>
+<img alt="Interfaces – creation screen" loading="lazy" src="img/eventstudio/vozezupcqxvdogil.png" width="900"/>
+<figcaption>Interfaces – creation screen</figcaption>
+</figure>
+<figure>
+<img alt="Interfaces – details screen" loading="lazy" src="img/eventstudio/3fp6gxaripz3snez.png" width="900"/>
+<figcaption>Interfaces – details screen</figcaption>
+</figure>
+<figure>
+<img alt="Interfaces – transport dialog" loading="lazy" src="img/eventstudio/swmk6cxzx38ult8r.png" width="900"/>
+<figcaption>Interfaces – transport dialog</figcaption>
+</figure>
+<figure>
+<img alt="Interfaces – deployment page" loading="lazy" src="img/eventstudio/n1oigzxrjmby0mys.png" width="900"/>
+<figcaption>Interfaces – deployment page</figcaption>
+</figure>
+<h2 id="events">Events</h2>
+<p>The <strong>Events</strong> page lists all predefined events available for configuration. Use the <strong>Create</strong> button to add a custom event definition via the Add Event Dialog. You can also update or delete existing entries. When adding a custom event you specify:</p>
+<ul>
+<li>Event Type (e.g., RAP Event)</li>
+<li>Catalog Object ID and version (links to a Payload Designer view)</li>
+<li>Object ID and Event Name</li>
+</ul>
+<figure>
+<img alt="Events – predefined events list" loading="lazy" src="img/eventstudio/nmle8ko1c05663ok.png" width="900"/>
+<figcaption>Events – predefined events list</figcaption>
+</figure>
+<figure>
+<img alt="Events – Add Event Dialog" loading="lazy" src="img/eventstudio/bd9lklnxihiupxky.png" width="900"/>
+<figcaption>Events – Add Event Dialog</figcaption>
+</figure>
+<h2 id="connections">Connections</h2>
+<p>The <strong>Connections</strong> page displays all configured connector instances in a table. To edit the details of a connection, click the link in the table row – this opens the connection settings in <strong>SAP GUI for HTML</strong>, where you can update RFC destinations, header attributes, and other parameters.</p>
+<figure>
+<img alt="Connections page" loading="lazy" src="img/eventstudio/v4nmi8s87v2r2aa5.png" width="900"/>
+<figcaption>Connections page</figcaption>
+</figure>
+<h2 id="monitoring">Monitoring</h2>
+<p>The <strong>Monitoring</strong> page lets you review system activity. Use the from/to timestamp filter to narrow the result set. The results table shows individual calls with status codes and timing information. Selecting a row expands the <strong>Traces</strong> section, where you can inspect the request and response payloads and download trace files.</p>
+<figure>
+<img alt="Monitoring page" loading="lazy" src="img/eventstudio/99u4wdiqyv53ukqu.png" width="900"/>
+<figcaption>Monitoring page</figcaption>
+</figure>
+<h2 id="help">Help</h2>
+<p>The <strong>Help</strong> page provides direct links to the ASAPIO documentation and implementation guidelines.</p>
+<figure>
+<img alt="Help page" loading="lazy" src="img/eventstudio/dzcbx06wlkv6ktfq.png" width="900"/>
+<figcaption>Help page</figcaption>
+</figure>
+<h2 id="deployment">Deployment</h2>
+<p>Event Studio can be deployed in two ways – on SAP BTP (recommended) or directly on your ABAP application server.</p>
+<h3 id="deploy-btp">Option A – SAP BTP via Business Application Studio</h3>
+<ol>
+<li>Import the project archive <code>eventstudio.tar</code> into your BAS Dev Space.</li>
+<li>Open a terminal in BAS and run <code>npm install</code> to install dependencies.</li>
+<li>Configure the application files:
+          <ul>
+<li><code>ui5.yaml</code> – UI5 tooling configuration</li>
+<li><code>xs-app.json</code> – routing and destination configuration</li>
+<li><code>App.controller.js</code> – back-end connectivity settings</li>
+</ul>
+</li>
+<li>Build and deploy the Multi-Target Application (MTA):
+          <ul>
+<li>Via BAS terminal: <code>cf deploy mta_archives/eventstudio_1.0.0.mtar</code></li>
+<li>Or via BAS UI: right-click the <code>.mtar</code> file → <strong>Deploy MTA Archive</strong></li>
+</ul>
+</li>
+</ol>
+<figure>
+<img alt="BAS – import project archive" loading="lazy" src="img/eventstudio/2ms2bnjwr8lbf16j.png" width="900"/>
+<figcaption>BAS – import project archive</figcaption>
+</figure>
+<figure>
+<img alt="BAS terminal – npm install" loading="lazy" src="img/eventstudio/k38d1j1xzu3fwp2n.png" width="900"/>
+<figcaption>BAS terminal – npm install</figcaption>
+</figure>
+<figure>
+<img alt="CF deploy – successful deployment" loading="lazy" src="img/eventstudio/e1pr8fjkw4peon1h.png" width="900"/>
+<figcaption>CF deploy – successful deployment</figcaption>
+</figure>
+<h3 id="deploy-abap">Option B – ABAP Application Server</h3>
+<ol>
+<li>Import the Event Studio transport request into your ABAP system via STMS.</li>
+<li>Activate the OData service <code>/ASADEV/GW_CONFIG_API_SRV</code> in transaction <code>/IWFND/MAINT_SERVICE</code>.</li>
+<li>Activate the ICF node at path <code>default_host &gt; sap &gt; bc &gt; bsp &gt; asadev &gt; app_ui</code> in transaction SICF.</li>
+</ol>
+<figure>
+<img alt="Activate OData service in /IWFND/MAINT_SERVICE" loading="lazy" src="img/eventstudio/if6zm2ue2p70d2nb.png" width="900"/>
+<figcaption>Activate OData service in /IWFND/MAINT_SERVICE</figcaption>
+</figure>
+<figure>
+<img alt="OData service details" loading="lazy" src="img/eventstudio/ti4il9aazr39toy3.png" width="900"/>
+<figcaption>OData service details</figcaption>
+</figure>
+<figure>
+<img alt="Activate ICF node in SICF" loading="lazy" src="img/eventstudio/cqd9pa0ni6s8y390.png" width="900"/>
+<figcaption>Activate ICF node in SICF</figcaption>
+</figure>
+<p>Optionally, you can configure Event Studio as an SAP Fiori Launchpad tile using transactions <code>/UI2/FLPD_CUST</code> or <code>/UI2/FLPCM_CUST</code>.</p>
+</main>
+<aside id="docs-toc">
+<p>On this page</p>
+<nav aria-label="Table of contents">
+<a href="#overview">Overview</a>
+<a href="#data-catalog">Data Catalog</a>
+<a href="#interfaces">Interfaces</a>
+<a href="#events">Events</a>
+<a href="#connections">Connections</a>
+<a href="#monitoring">Monitoring</a>
+<a href="#help">Help</a>
+<a href="#deployment">Deployment</a>
+<a href="#deploy-btp">Option A – SAP BTP (BAS)</a>
+<a href="#deploy-abap">Option B – ABAP Server</a>
+</nav>
+</aside>
+</div>
+</body>
+</html>

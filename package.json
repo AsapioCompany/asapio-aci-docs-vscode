@@ -1,6 +1,6 @@
 {
   "name": "asapio-aci-docs",
-  "displayName": "ASAPIO ACI Docs",
+  "displayName": "ASAPIO Docs MCP",
   "description": "MCP Server for ASAPIO Integration Add-on Documentation – search and retrieve docs directly in GitHub Copilot Chat",
   "version": "1.0.1",
   "publisher": "ASAPIO",
@@ -71,6 +71,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "node-html-parser": "^7.1.0",
+    "sharp": "^0.34.5",
     "zod": "^4.3.6"
   }
 }

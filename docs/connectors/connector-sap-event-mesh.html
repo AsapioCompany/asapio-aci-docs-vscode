@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="ASAPIO SAP Event Mesh connector – publish and consume events on SAP Event Mesh and SAP Advanced Event Mesh on SAP BTP." name="description"/>
+<title>SAP Event Mesh Connector – ASAPIO Docs</title>
+<link href="https://www.asapio.com/docs/connector-sap-event-mesh.html" hreflang="en" rel="alternate"/>
+<link href="https://www.asapio.com/de/docs/connector-sap-event-mesh.html" hreflang="de" rel="alternate"/>
+<link href="https://www.asapio.com/docs/connector-sap-event-mesh.html" hreflang="x-default" rel="alternate"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'&gt;&lt;rect width='32' height='32' rx='7' fill='%23d25b51'/&gt;&lt;text y='23' x='5' font-size='19' font-family='sans-serif' font-weight='bold' fill='white'&gt;A&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+</head>
+<body>
+
+
+<div>
+
+<main id="docs-content">
+<div>Connectors</div>
+<h1>SAP Event Mesh Connector</h1>
+<p>Publish and consume events on SAP Event Mesh and SAP Advanced Event Mesh – the native event broker for SAP BTP. Ideal for SAP-to-SAP BTP integration and event-driven BTP extension scenarios.</p>
+<h2 id="overview">Overview</h2>
+<p>SAP Event Mesh is SAP BTP's managed message broker service, part of SAP Integration Suite. It provides queues, topics, and webhooks with enterprise-grade reliability. SAP Advanced Event Mesh (AEM), powered by Solace technology, extends Event Mesh with enterprise mesh capabilities for large-scale, multi-region deployments.</p>
+<p>ASAPIO supports both:</p>
+<ul>
+<li><strong>SAP Event Mesh</strong> – standard plan and default plan, using HTTP REST protocol with OAuth 2.0 authentication from BTP service key</li>
+<li><strong>SAP Advanced Event Mesh</strong> – broker URL and VPN name from AEM service key, AMQP 1.0 protocol, mesh topology and cross-region replication</li>
+<li><strong>Directions</strong>: Outbound (SAP → Event Mesh) and Inbound (Event Mesh → SAP via polling or webhook subscription)</li>
+<li><strong>CloudEvents</strong>: natively supported – SAP Event Mesh and AEM both support CloudEvents 1.0</li>
+</ul>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>SAP BTP account (trial or production)</li>
+<li>SAP Event Mesh service instance created in BTP (standard plan or default plan)</li>
+<li>Service key created for the Event Mesh instance</li>
+<li>For AEM: Advanced Event Mesh service instance and service key from BTP</li>
+<li>TCP outbound access from SAP to BTP endpoints: <code>*.enterprise-messaging.cloud.sap</code> on port 443</li>
+</ul>
+<h2 id="service-key">Getting the Service Key</h2>
+<p>The service key JSON contains all credentials and endpoint URLs needed for the ASAPIO connector. Obtain it from the BTP Cockpit:</p>
+<div>
+<div>
+<div></div>
+<div>
+<h3>Open BTP Cockpit</h3>
+<p>Log in to <strong>account.hana.ondemand.com</strong>. Navigate to your subaccount and select the <strong>Space</strong> where your Event Mesh instance resides.</p>
+</div>
+</div>
+<div>
+<div></div>
+<div>
+<h3>Find the Event Mesh instance</h3>
+<p>Go to <strong>Services → Service Instances</strong>. Find your Event Mesh instance (service name: <code>enterprise-messaging</code>). Click on it.</p>
+</div>
+</div>
+<div>
+<div></div>
+<div>
+<h3>Create a service key</h3>
+<p>Click <strong>Service Keys → Create</strong>. Give it a name (e.g. <code>asapio-key</code>). Leave parameters empty for a standard key. Click <strong>Create</strong>.</p>
+</div>
+</div>
+<div>
+<div></div>
+<div>
+<h3>Download the JSON</h3>
+<p>Click the key name to view its JSON content. Copy the full JSON or download it. The key looks like this:</p>
+</div>
+</div>
+</div>
+<pre><span>{
+  "namespace": "default/asapio.com/integration/",
+  "instanceid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "messaging": [
+    {
+      "oa2": {
+        "clientid": "sb-clone-xxxx",
+        "clientsecret": "xxxx-xxxx-xxxx",
+        "tokenendpoint": "https://xxx.authentication.eu10.hana.ondemand.com/oauth/token",
+        "granttype": "client_credentials"
+      },
+      "protocol": ["httprest"],
+      "broker": {
+        "type": "sapmgw"
+      },
+      "uri": "https://enterprise-messaging-pubsub.cfapps.eu10.hana.ondemand.com"
+    }
+  ],
+  "serviceinstanceid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "xsappname": "clone-xxxx"
+}</span></pre>
+<h2 id="configuration">Configuration in ASAPIO</h2>
+<p>In ASAPIO Event Studio, open the SAP Event Mesh connector properties. You have two configuration options:</p>
+<h4>Option 1: Paste full service key JSON</h4>
+<p>Click <strong>Import Service Key</strong> and paste the entire JSON from BTP. ASAPIO parses the JSON and extracts all required fields automatically.</p>
+<h4>Option 2: Manual field entry</h4>
+<p>Enter each field individually:</p>
+<table>
+<thead>
+<tr><th>Field</th><th>Source in Service Key</th><th>Example Value</th></tr>
+</thead>
+<tbody>
+<tr><td>Token Endpoint</td><td><code>messaging[0].oa2.tokenendpoint</code></td><td><code>https://xxx.authentication.eu10.hana.ondemand.com/oauth/token</code></td></tr>
+<tr><td>Client ID</td><td><code>messaging[0].oa2.clientid</code></td><td><code>sb-clone-xxxx</code></td></tr>
+<tr><td>Client Secret</td><td><code>messaging[0].oa2.clientsecret</code></td><td>stored in SAP Secure Storage</td></tr>
+<tr><td>REST URL</td><td><code>messaging[0].uri</code></td><td><code>https://enterprise-messaging-pubsub.cfapps.eu10.hana.ondemand.com</code></td></tr>
+<tr><td>Namespace</td><td><code>namespace</code></td><td><code>default/asapio.com/integration/</code></td></tr>
+</tbody>
+</table>
+<h2 id="queue-topic">Queue and Topic Configuration</h2>
+<p>SAP Event Mesh uses a namespace-prefixed naming convention for topics and queues.</p>
+<h4>Namespace format</h4>
+<p>The namespace is defined in the service key and follows the pattern: <code>default/&lt;domain&gt;/&lt;system&gt;/</code></p>
+<p>Example: <code>default/asapio.com/integration/</code></p>
+<h4>Topic naming</h4>
+<p>Topics must start with the namespace. ASAPIO recommends the following convention:</p>
+<pre>default/asapio.com/sap/&lt;SID&gt;/&lt;module&gt;/&lt;event-type&gt;
+
+Example: default/asapio.com/sap/PRD/mm/goodsmovement</pre>
+<h4>Queue vs. Topic Subscription</h4>
+<ul>
+<li><strong>Queue</strong>: persistent storage, one consumer at a time. Use for reliable, ordered, point-to-point delivery.</li>
+<li><strong>Topic Subscription</strong>: multiple consumers can subscribe to the same topic. Use for publish/subscribe fan-out scenarios.</li>
+</ul>
+<div>
+<span>ℹ️</span>
+<div>
+<div>Create queues before publishing</div>
+<p>SAP Event Mesh does not auto-create queues. Create queues in the Event Mesh cockpit (or via the Management API) before activating your ASAPIO flow. Topics are created on first publish.</p>
+</div>
+</div>
+<h2 id="cloudevents">CloudEvents Integration</h2>
+<p>SAP Event Mesh natively supports CloudEvents 1.0 as the message format. When publishing via ASAPIO, the following CloudEvents attributes are set:</p>
+<table>
+<thead>
+<tr><th>Attribute</th><th>Value</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>specversion</code></td><td><code>1.0</code></td><td>Always 1.0</td></tr>
+<tr><td><code>source</code></td><td><code>urn:asapio:s4hana:&lt;SID&gt;</code></td><td>e.g. <code>urn:asapio:s4hana:PRD</code></td></tr>
+<tr><td><code>type</code></td><td><code>com.asapio.sap.&lt;module&gt;.&lt;event&gt;</code></td><td>e.g. <code>com.asapio.sap.s4hana.mm.goodsmovement</code></td></tr>
+<tr><td><code>id</code></td><td>UUID v4, auto-generated</td><td>Unique per message</td></tr>
+<tr><td><code>time</code></td><td>ISO 8601 UTC</td><td>Posting time in SAP</td></tr>
+<tr><td><code>datacontenttype</code></td><td><code>application/json</code></td><td>Always JSON for Event Mesh connector</td></tr>
+</tbody>
+</table>
+<h2 id="aem">Advanced Event Mesh</h2>
+<p>SAP Advanced Event Mesh (AEM) extends Event Mesh with Solace-based enterprise features. To configure the AEM connector in ASAPIO, obtain the AEM service key from BTP (service: <code>enterprise-messaging</code> with AEM plan, or the dedicated AEM service).</p>
+<p>Additional AEM-specific settings:</p>
+<ul>
+<li><strong>Broker URL</strong>: from the AEM service key, the AMQP endpoint (e.g. <code>amqps://mr-xxxxxx.messaging.solace.cloud:5671</code>)</li>
+<li><strong>VPN Name</strong>: the message VPN from the AEM service key</li>
+<li><strong>Messaging Endpoints</strong>: REST endpoint for management operations</li>
+<li><strong>Mesh Topology</strong>: configure broker links in the AEM console to enable cross-region event replication – ASAPIO publishes to the local broker; AEM handles global distribution automatically</li>
+</ul>
+<div>
+<span>💡</span>
+<div>
+<div>AEM for multi-region SAP landscapes</div>
+<p>If you have SAP systems in multiple regions (e.g. EU and US), AEM's mesh topology allows events published from the EU SAP system to be automatically replicated to the US event broker, so US consumers can subscribe locally without cross-region latency.</p>
+</div>
+</div>
+<h2 id="testing">Testing</h2>
+<p>Use the SAP Event Mesh cockpit (accessible from BTP Cockpit → Services → Event Mesh → Manage) to:</p>
+<ul>
+<li>View published events in queue browsers</li>
+<li>Check queue depth and consumer count</li>
+<li>Replay or delete messages from queues</li>
+<li>Monitor event delivery status</li>
+<li>Test topic subscriptions</li>
+</ul>
+<p>After activating your ASAPIO flow, trigger a test event using Event Studio's <strong>Test Run</strong> function and then verify the message appears in the Event Mesh cockpit queue browser.</p>
+<nav>
+<a href="connector-kafka.html">
+<span>← Previous</span>
+<span>Kafka / Confluent Connector</span>
+</a>
+<a href="inbound.html">
+<span>Next →</span>
+<span>Inbound Messaging</span>
+</a>
+</nav>
+</main>
+<aside id="docs-toc">
+<div>On this page</div>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#service-key">Getting the Service Key</a></li>
+<li><a href="#configuration">Configuration in ASAPIO</a></li>
+<li><a href="#queue-topic">Queue and Topic Config</a></li>
+<li><a href="#cloudevents">CloudEvents Integration</a></li>
+<li><a href="#aem">Advanced Event Mesh</a></li>
+<li><a href="#testing">Testing</a></li>
+</ul>
+</aside>
+</div>
+<footer>
+<div>
+<div>
+<div><a href="../index.html"><span><svg height="32" viewbox="0 0 40 40" width="32"><rect fill="#d25b51" height="40" rx="7" width="40"></rect><rect fill="white" height="9" rx="1.5" width="9" x="5" y="5"></rect><rect fill="white" height="9" rx="1.5" width="9" x="16" y="5"></rect><rect fill="white" height="9" rx="1.5" width="9" x="27" y="5"></rect><rect fill="white" height="9" rx="1.5" width="9" x="5" y="16"></rect><rect fill="white" height="9" rx="1.5" width="9" x="16" y="16"></rect><rect fill="white" height="9" rx="1.5" width="9" x="27" y="16"></rect><rect fill="white" height="9" rx="1.5" width="9" x="5" y="27"></rect><rect fill="white" height="9" rx="1.5" width="9" x="16" y="27"></rect></svg></span><span>ASAPIO</span></a><p>SAP integration specialists. Munich, Germany. Since 2003.</p><span>SAP Partner</span></div>
+<div><div>Solutions</div><div><a href="../integration/index.html">Cloud Integration</a><a href="../s4hana/index.html">S/4HANA</a><a href="../ariba/index.html">SAP Ariba</a><a href="../fieldglass/index.html">SAP Fieldglass</a></div></div>
+<div><div>Documentation</div><div><a href="index.html">Docs Home</a><a href="getting-started.html">Getting Started</a><a href="connectors.html">Connectors</a><a href="faq.html">FAQ</a></div></div>
+<div><div>Company</div><div><a href="../about.html">About ASAPIO</a><a href="../references.html">Case Studies</a><a href="../contact.php">Contact</a></div></div>
+</div>
+<div><p>© 2026 ASAPIO GmbH. All rights reserved.</p><div><a href="../privacy.html">Privacy Policy</a><a href="../impressum.html">Legal Notice</a><a href="../terms.html">Terms &amp; Conditions</a></div></div>
+</div>
+</footer>
+<button aria-label="Toggle sidebar" id="sidebar-toggle">☰</button>
+</body>
+</html>

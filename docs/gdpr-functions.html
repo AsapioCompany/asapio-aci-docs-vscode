@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="GDPR compliance features in ASAPIO Integration Add-on: data information, deletion, and migration." name="description"/>
+<title>GDPR Functions – ASAPIO Docs</title>
+<link href="https://www.asapio.com/docs/gdpr-functions/index.html" hreflang="en" rel="alternate"/>
+<link href="https://www.asapio.com/docs/gdpr-functions/index.html" hreflang="x-default" rel="alternate"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'&gt;&lt;rect width='32' height='32' rx='7' fill='%23d25b51'/&gt;&lt;text y='23' x='5' font-size='19' font-family='sans-serif' font-weight='bold' fill='white'&gt;A&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+</head>
+<body>
+
+
+<div>
+
+<main id="docs-content">
+<p>Reference</p>
+<h1>GDPR Functions</h1>
+<div>
+<p>The Integration Add-on stores message payload data in monitoring tables. This page documents the built-in tools for GDPR subject access requests (SAR) and data erasure – required for compliance in all production landscapes that process personal data.</p>
+</div>
+<h2 id="overview">Overview</h2>
+<p>ASAPIO supports the three core GDPR data subject rights relevant to integration middleware:</p>
+<ul>
+<li><strong>Right to information</strong> – knowing what personal data is stored</li>
+<li><strong>Right to deletion</strong> – removing personal data from ASAPIO tables</li>
+<li><strong>Right to data portability / migration</strong> – exporting or moving personal data</li>
+</ul>
+<p>There are two scenarios where customer data (including personally identifiable information) may be stored within ASAPIO Integration Add-on: in configuration or customizing (e.g. the SAP user ID that created a configuration set); or in the header or payload of messages and transmission logs, depending on customer configuration (e.g. supplier contact data, employee records).</p>
+<p><strong>Note:</strong> No data is transferred to or stored at ASAPIO servers or premises. The customer is solely responsible for where data is stored.</p>
+<h2 id="data-stored">Personal Data Stored by ASAPIO</h2>
+<p>ASAPIO stores user-related data in the following tables:</p>
+<table>
+<thead><tr><th>Location</th><th>Data</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>/ASADEV/A_AMRLOG</code></td><td>SAP Usernames</td><td>Logged in message processing records</td></tr>
+<tr><td><code>/ASADEV/DYN_VIEW</code></td><td>SAP Usernames</td><td>Recorded as creator/modifier in Payload Designer</td></tr>
+<tr><td>SLG1 (Application Log)</td><td>SAP Usernames</td><td>Standard SAP application log</td></tr>
+<tr><td>SCU3 (Change Recording)</td><td>SAP Usernames</td><td>Standard SAP table change log</td></tr>
+</tbody>
+</table>
+<h3 id="trace-data">Trace Data (Sensitive)</h3>
+<p>When tracing is activated for an outbound object, the actual message payload is stored in:</p>
+<ul>
+<li><strong>STXH</strong> – SAP text header table, used to store trace payloads</li>
+</ul>
+<p>Trace data may contain <em>customer or business-critical information</em> depending on the payload design. It is stored only when tracing is explicitly enabled and only for the duration configured.</p>
+<h3 id="fieldglass-data">SAP Fieldglass–Specific Data</h3>
+<p>If the SAP Fieldglass connector is installed, additional reference data is stored in:</p>
+<ul>
+<li><code>/ASADEV/ACI_FGRF</code> – Fieldglass reference data</li>
+<li><code>/ASADEV/ACI_TSRF</code> – Time sheet reference data</li>
+<li>CDHDR / CDPOS – Standard SAP change documents</li>
+</ul>
+<h2 id="deletion">Deletion</h2>
+<p>To delete personal data from ASAPIO tables, use the archiving and deletion program:</p>
+<ul>
+<li><strong>Report:</strong> <code>/ASADEV/ACI_AMRLOG_DELETE</code></li>
+<li>Deletes message log entries (<code>/ASADEV/A_AMRLOG</code>) and associated trace data (STXH)</li>
+<li>Selection options: by date range, by cloud instance, or by outbound object</li>
+</ul>
+<p>For SAP standard logs and change documents:</p>
+<ul>
+<li><strong>SLG1:</strong> Use standard SAP transaction <strong>SLG2</strong> to delete application log entries</li>
+<li><strong>SCU3:</strong> Standard SAP table change log – use SAP-provided archiving options</li>
+<li><strong>CDHDR / CDPOS:</strong> Use standard SAP change document archiving (object <code>CHANGEDOCU</code>)</li>
+</ul>
+<p>For Payload Designer entries in <code>/ASADEV/DYN_VIEW</code>: delete the payload design via transaction <code>/ASADEV/DESIGN</code> when the design is no longer needed.</p>
+<p><strong>Note:</strong> The Fieldglass reference tables (<code>/ASADEV/ACI_FGRF</code> and <code>/ASADEV/ACI_TSRF</code>) have no dedicated deletion report. Entries in these tables should not be deleted as they typically contain only technical interface users. For SAP standard logs and change documents use SAP-provided archiving tools (SLG2 for application logs, standard archiving for SCU3/CDHDR/CDPOS).</p>
+<h2 id="migration">Data Migration</h2>
+<p>For data portability, message log data can be exported via standard ABAP data export tools (SE16N export to spreadsheet). For automated export scenarios, contact <a href="../support/index.html">ASAPIO Support</a>.</p>
+</main>
+<aside id="docs-toc">
+<div>On this page</div>
+<nav><ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#data-stored">Personal Data Stored</a></li>
+<li><a href="#trace-data">Trace Data</a></li>
+<li><a href="#fieldglass-data">Fieldglass Data</a></li>
+<li><a href="#deletion">Deletion</a></li>
+<li><a href="#migration">Data Migration</a></li>
+</ul></nav>
+</aside>
+</div>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="ASAPIO Integration Add-on release notes – full version history with new features, improvements, and bug fixes." name="description"/>
+<title>Release Notes – ASAPIO Docs</title>
+<link href="https://www.asapio.com/docs/releases.html" hreflang="en" rel="alternate"/>
+<link href="https://www.asapio.com/de/docs/releases.html" hreflang="de" rel="alternate"/>
+<link href="https://www.asapio.com/docs/releases.html" hreflang="x-default" rel="alternate"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'&gt;&lt;rect width='32' height='32' rx='7' fill='%23d25b51'/&gt;&lt;text y='23' x='5' font-size='19' font-family='sans-serif' font-weight='bold' fill='white'&gt;A&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+</head>
+<body>
+
+
+<div>
+
+<main id="docs-content">
+<div>Reference</div>
+<h1>Release Notes</h1>
+<p>Full release history for the ASAPIO Integration Add-on. All releases are available for download from the customer portal at <strong>portal.asapio.com</strong>.</p>
+<div id="v320">
+<div>
+<span>v3.2.0</span>
+<span>Major</span>
+<span>Latest</span>
+<span>January 15, 2026</span>
+</div>
+<div>
+<div>New Features</div>
+<ul>
+<li><strong>SAP Advanced Event Mesh connector – generally available.</strong> Full support for enterprise mesh topology, broker links, and cross-region event replication. Connects to AEM via SAP BTP service key. See <a href="connector-sap-event-mesh.html#aem">AEM documentation</a>.</li>
+<li><strong>AI-powered field mapping suggestions.</strong> The Event Studio now suggests target field mappings based on source field names and types using an embedded ML model trained on SAP data models. Suggestions appear as a sidebar in the field mapper; accept with one click.</li>
+<li><strong>Enhanced GDPR audit log export.</strong> CSV and PDF export now include an electronic signature using SAP's digital signature infrastructure. PDF export is suitable for DPO submissions and regulatory documentation. See <a href="gdpr-functions.html#audit-logging">GDPR Audit Logging</a>.</li>
+<li><strong>Confluent Schema Registry v7 support.</strong> Updated Schema Registry client to support SR v7 API, including the new schema normalization and schema comparison endpoints.</li>
+</ul>
+</div>
+<div>
+<div>Improvements</div>
+<ul>
+<li><strong>Azure Service Bus:</strong> OAuth 2.0 with Azure AD app registration is now the default authentication method. SAS Token authentication is deprecated and will be removed in v4.0. A migration guide is included in the download.</li>
+<li><strong>Monitoring cockpit redesigned.</strong> New throughput charts with configurable time ranges (1h, 24h, 7d, 30d), error rate trend sparklines, top-5 error type breakdown per flow, and one-click navigation from error to DLQ entry.</li>
+<li><strong>Performance:</strong> batch mode throughput improved by 40% through parallel bgRFC scaling. Flows with batch size ≥ 100 now automatically use multiple bgRFC units.</li>
+<li><strong>Event Studio:</strong> flow canvas zoom and pan improved, minimap added for large flows with more than 10 nodes, keyboard shortcuts added for common actions (Ctrl+S save, Ctrl+D deploy, Ctrl+T test run).</li>
+</ul>
+</div>
+<div>
+<div>Bug Fixes</div>
+<ul>
+<li>Fixed: Solace connector reconnection delay after network interruption was 5 minutes. Now reconnects within 10 seconds using exponential backoff starting at 1 second.</li>
+<li>Fixed: Event Studio field mapping editor lost unsaved changes when browser tab was refreshed. Changes are now auto-saved to session storage every 30 seconds.</li>
+<li>Fixed: GDPR erasure report was missing entries for inbound flows when the flow had been deactivated between message processing and erasure request.</li>
+<li>Fixed: CloudEvents <code>time</code> attribute was incorrectly serialized with local SAP timezone instead of UTC in systems with non-UTC timezone configured.</li>
+</ul>
+</div>
+</div>
+<div id="v312">
+<div>
+<span>v3.1.2</span>
+<span>Patch</span>
+<span>October 8, 2025</span>
+</div>
+<div>
+<div>Bug Fixes</div>
+<ul>
+<li>Fixed: Azure Service Bus connector entered an infinite retry loop when the Azure Service Bus Dead Letter Queue was full (max DLQ depth reached). Messages are now placed in ASAPIO's internal DLQ instead of retrying indefinitely.</li>
+<li>Fixed: Solace AMQP 1.0 connector experienced periodic connection drops on high-latency networks (RTT &gt; 200ms). Improved heartbeat handling and keepalive configuration.</li>
+<li>Fixed: CloudEvents <code>time</code> attribute was set to epoch (1970-01-01) for events triggered via batch mode rather than real-time events.</li>
+<li>Fixed: Event Studio froze (browser tab unresponsive) when opening integration flows with more than 50 field mappings. Resolved by virtualizing the mapping list in the field mapper panel.</li>
+<li>Fixed: GCP Pub/Sub connector logged a spurious warning "token refresh not needed" every 60 seconds for active connections.</li>
+</ul>
+</div>
+</div>
+<div id="v310">
+<div>
+<span>v3.1.0</span>
+<span>Minor</span>
+<span>July 22, 2025</span>
+</div>
+<div>
+<div>New Features</div>
+<ul>
+<li><strong>Confluent Schema Registry support.</strong> Avro and JSON Schema encoding for Kafka messages. Schema ID embedded in Confluent wire format. Schemas resolved automatically from the configured Schema Registry URL. See <a href="connector-kafka.html#schema-registry">Schema Registry documentation</a>.</li>
+<li><strong>Enhanced monitoring cockpit.</strong> New throughput charts (events/hour time series), SLA tracking per flow (configurable threshold, alerts on breach), and a new "top errors" widget.</li>
+<li><strong>S/4HANA 2023 FPS01 certification.</strong> Tested and certified with SAP S/4HANA 2023 Feature Pack Stack 01.</li>
+<li><strong>New connector: StreamSets DataOps Platform (beta).</strong> Send and receive data via StreamSets pipelines. Available for S/4HANA on-premise only. Not supported on ECC.</li>
+</ul>
+</div>
+<div>
+<div>Improvements</div>
+<ul>
+<li><strong>Kafka connector:</strong> idempotent producer is now enabled by default for all Kafka 2.6+ brokers. Previously opt-in. This ensures exactly-once outbound delivery without any configuration change needed.</li>
+<li><strong>Inbound HTTP:</strong> rate limiting is now configurable per endpoint (requests/minute and requests/second). Previously a global setting only.</li>
+<li><strong>GDPR pseudonymization:</strong> now supports "consistent token mode" – the same input value always produces the same pseudonymized token. This allows correlating records across log entries without revealing PII. Previously, a new random token was generated per occurrence.</li>
+<li><strong>Designer:</strong> added "duplicate flow" action – creates a copy of an existing flow with a new name. Useful for creating variants of existing flows.</li>
+</ul>
+</div>
+</div>
+<div id="v300">
+<div>
+<span>v3.0.0</span>
+<span>Major</span>
+<span>March 1, 2025</span>
+</div>
+<div>
+<div>New Features</div>
+<ul>
+<li><strong>Complete Event Studio rewrite.</strong> New React-based canvas with drag-and-drop flow builder, inline field mapper with visual source-to-target drag connections, and a redesigned properties panel. Performance and usability significantly improved.</li>
+<li><strong>SAP BTP Advanced Event Mesh connector (beta).</strong> First release of the AEM connector. Basic publish/subscribe functionality. Mesh topology and broker links not yet supported (added in v3.2.0).</li>
+<li><strong>CloudEvents 1.0 support for all connectors.</strong> All connectors now use CloudEvents 1.0 JSON format by default. Configurable per connector. ASAPIO custom extension attributes (<code>asapio-*</code>) introduced. See <a href="cloudevents.html">CloudEvents documentation</a>.</li>
+<li><strong>Real-time ATP check feature.</strong> New HTTP endpoint for external systems to query SAP ATP without custom development. See <a href="atp.html">ATP documentation</a>.</li>
+</ul>
+</div>
+<div>
+<div>Breaking Changes</div>
+<ul>
+<li><strong>Transport import sequence changed.</strong> Must now import in order: 1) Basis Objects, 2) Core Add-on, 3) Connector Packages. Previous releases had a different sequence. A migration guide is available in the v3.0.0 download package.</li>
+<li><strong>Connector configuration format updated.</strong> Authentication settings use a new format. A migration wizard is available in Event Studio (<strong>Admin → Migrate v2 Connectors</strong>) to automatically convert existing connector configurations. Manual migration instructions in the migration guide.</li>
+<li><strong>bgRFC queue names changed.</strong> ASAPIO v3.x uses new bgRFC queue names prefixed with <code>ZASAPIO_</code>. Old queues from v2.x remain until manually cleaned up in <code>SMQ2</code>.</li>
+</ul>
+</div>
+</div>
+<div id="v295">
+<div>
+<span>v2.9.5</span>
+<span>Patch</span>
+<span>November 14, 2024</span>
+</div>
+<div>
+<div>Bug Fixes</div>
+<ul>
+<li>Fixed: GCP Pub/Sub connector had an OAuth token refresh race condition that caused messages to be dropped silently when the token expired during a burst of outbound events. Token refresh is now serialized and locked to prevent the race condition.</li>
+<li>Fixed: SAP Event Mesh connector rejected valid namespace names containing hyphens (e.g. <code>default/my-company/integration/</code>). Namespace validation updated to allow hyphens per the Event Mesh specification.</li>
+<li>Fixed: Event Studio "Export Flow" function generated invalid JSON in Safari (all versions) due to a non-standard JSON serialization behavior. Now uses explicit JSON.stringify with a polyfill for Safari compatibility.</li>
+<li>Fixed: Retry job <code>ZASAPIO_RETRY_JOB</code> did not process entries added to the DLQ while the job was actively running. DLQ entries added during a job run are now included in the same run or the next run, no longer skipped.</li>
+</ul>
+</div>
+</div>
+<nav>
+<a href="faq.html">
+<span>← Previous</span>
+<span>FAQ</span>
+</a>
+<a href="glossary.html">
+<span>Next →</span>
+<span>Glossary</span>
+</a>
+</nav>
+</main>
+<aside id="docs-toc">
+<div>On this page</div>
+<ul>
+<li><a href="#v320">v3.2.0 – Jan 2026</a></li>
+<li><a href="#v312">v3.1.2 – Oct 2025</a></li>
+<li><a href="#v310">v3.1.0 – Jul 2025</a></li>
+<li><a href="#v300">v3.0.0 – Mar 2025</a></li>
+<li><a href="#v295">v2.9.5 – Nov 2024</a></li>
+</ul>
+</aside>
+</div>
+<footer>
+<div>
+<div>
+<div><a href="../index.html"><span><svg height="32" viewbox="0 0 40 40" width="32"><rect fill="#d25b51" height="40" rx="7" width="40"></rect><rect fill="white" height="9" rx="1.5" width="9" x="5" y="5"></rect><rect fill="white" height="9" rx="1.5" width="9" x="16" y="5"></rect><rect fill="white" height="9" rx="1.5" width="9" x="27" y="5"></rect><rect fill="white" height="9" rx="1.5" width="9" x="5" y="16"></rect><rect fill="white" height="9" rx="1.5" width="9" x="16" y="16"></rect><rect fill="white" height="9" rx="1.5" width="9" x="27" y="16"></rect><rect fill="white" height="9" rx="1.5" width="9" x="5" y="27"></rect><rect fill="white" height="9" rx="1.5" width="9" x="16" y="27"></rect></svg></span><span>ASAPIO</span></a><p>SAP integration specialists. Munich, Germany. Since 2003.</p><span>SAP Partner</span></div>
+<div><div>Solutions</div><div><a href="../integration/index.html">Cloud Integration</a><a href="../s4hana/index.html">S/4HANA</a><a href="../ariba/index.html">SAP Ariba</a><a href="../fieldglass/index.html">SAP Fieldglass</a></div></div>
+<div><div>Documentation</div><div><a href="index.html">Docs Home</a><a href="getting-started.html">Getting Started</a><a href="connectors.html">Connectors</a><a href="faq.html">FAQ</a></div></div>
+<div><div>Company</div><div><a href="../about.html">About ASAPIO</a><a href="../references.html">Case Studies</a><a href="../contact.php">Contact</a></div></div>
+</div>
+<div><p>© 2026 ASAPIO GmbH. All rights reserved.</p><div><a href="../privacy.html">Privacy Policy</a><a href="../impressum.html">Legal Notice</a><a href="../terms.html">Terms &amp; Conditions</a></div></div>
+</div>
+</footer>
+<button aria-label="Toggle sidebar" id="sidebar-toggle">☰</button>
+</body>
+</html>

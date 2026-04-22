@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="ASAPIO documentation glossary – definitions of key terms and concepts used in SAP integration with ASAPIO." name="description"/>
+<title>Glossary – ASAPIO Docs</title>
+<link href="https://www.asapio.com/docs/glossary.html" hreflang="en" rel="alternate"/>
+<link href="https://www.asapio.com/de/docs/glossary.html" hreflang="de" rel="alternate"/>
+<link href="https://www.asapio.com/docs/glossary.html" hreflang="x-default" rel="alternate"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'&gt;&lt;rect width='32' height='32' rx='7' fill='%23d25b51'/&gt;&lt;text y='23' x='5' font-size='19' font-family='sans-serif' font-weight='bold' fill='white'&gt;A&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+</head>
+<body>
+
+
+<div>
+
+<main id="docs-content">
+<div>Reference</div>
+<h1>Glossary</h1>
+<p>Key terms and concepts used in ASAPIO documentation and in SAP integration contexts. Terms are listed alphabetically.</p>
+<div>
+<div id="a">A</div>
+<div id="term-abap">
+<div>ABAP</div>
+<p>Advanced Business Application Programming – the primary programming language of the SAP platform. ASAPIO runs as native ABAP code within the SAP ABAP application server, requiring no external runtime or middleware. ABAP programs, classes, and function modules are transported via SAP's standard transport system (STMS).</p>
+</div>
+<div id="term-aem">
+<div>Advanced Event Mesh (AEM)</div>
+<p>SAP's enterprise-grade event mesh service, built on Solace PubSub+ technology and available as part of SAP BTP. AEM extends the capabilities of SAP Event Mesh with support for mesh topology (connecting multiple event brokers), broker links for cross-region event replication, and dynamic message routing. The ASAPIO <a href="connector-sap-event-mesh.html">SAP Event Mesh connector</a> supports both standard Event Mesh and AEM.</p>
+</div>
+<div id="term-amqp">
+<div>AMQP (Advanced Message Queuing Protocol)</div>
+<p>An open standard application layer protocol for message-oriented middleware. AMQP 1.0 is an ISO standard and is supported by Azure Service Bus, Azure Event Hub, Solace PubSub+, and SAP Event Mesh. ASAPIO uses AMQP 1.0 as the preferred protocol for Azure and Solace connectors due to its performance and reliability characteristics.</p>
+</div>
+<div id="term-atp">
+<div>ATP (Available-to-Promise)</div>
+<p>SAP's capability to check real-time material availability for a requested quantity and delivery date. ATP considers current stock levels, planned receipts (purchase orders, production orders), and planned issues (sales orders) to determine whether a requested quantity can be confirmed and on what date. ASAPIO exposes this capability as a REST API for external systems. See <a href="atp.html">Real-Time ATP Check</a>.</p>
+</div>
+<div id="term-avro">
+<div>Avro</div>
+<p>A compact binary data serialization format developed by the Apache Software Foundation, widely used in Kafka-based event streaming. Avro uses a JSON-defined schema to describe the data structure. ASAPIO supports Avro encoding for Kafka messages when a Confluent Schema Registry is configured. See <a href="connector-kafka.html#schema-registry">Kafka Schema Registry Integration</a>.</p>
+</div>
+<div id="b">B</div>
+<div id="term-bapi">
+<div>BAPI (Business API)</div>
+<p>SAP's standard programming interface for executing business processes. BAPIs are RFC-enabled function modules that provide a stable, versioned API for creating or changing SAP business documents. ASAPIO uses BAPIs as the target actions for inbound flows (e.g. <code>BAPI_GOODSMVT_CREATE</code> for goods movements, <code>BAPI_PO_CREATE1</code> for purchase orders).</p>
+</div>
+<div id="term-bgrfc">
+<div>bgRFC (Background Remote Function Call)</div>
+<p>SAP's framework for reliable, asynchronous message delivery using background work processes. bgRFC guarantees at-least-once delivery: if the SAP system is restarted during message processing, the framework resumes delivery after restart. ASAPIO uses bgRFC for all outbound message delivery, ensuring no events are lost during SAP maintenance windows.</p>
+</div>
+<div id="term-btp">
+<div>BTP (SAP Business Technology Platform)</div>
+<p>SAP's unified cloud platform for extension, integration, data, and analytics. BTP hosts services including SAP Event Mesh, SAP Advanced Event Mesh, SAP Integration Suite, and SAP Build. ASAPIO integrates with BTP services via their REST APIs and service keys.</p>
+</div>
+<div id="c">C</div>
+<div id="term-cloudevents">
+<div>CloudEvents</div>
+<p>A specification from the Cloud Native Computing Foundation (CNCF) that defines a common, vendor-neutral format for describing event data. CloudEvents 1.0 defines required attributes (<code>specversion</code>, <code>id</code>, <code>source</code>, <code>type</code>) and optional attributes (<code>time</code>, <code>datacontenttype</code>, <code>dataschema</code>). ASAPIO supports CloudEvents 1.0 as the default message format for all connectors since v3.0.0. See <a href="cloudevents.html">CloudEvents Support</a>.</p>
+</div>
+<div id="term-consumer-group">
+<div>Consumer Group</div>
+<p>A Kafka concept: a named group of consumer instances that collectively consume a topic's partitions. Each partition is consumed by exactly one member of the group at a time. Each consumer group maintains its own independent read offset – multiple groups can consume the same topic without interfering with each other. ASAPIO creates one consumer group per inbound Kafka flow; the group ID is configurable.</p>
+</div>
+<div id="d">D</div>
+<div id="term-dlq">
+<div>Dead Letter Queue (DLQ)</div>
+<p>A storage area for messages that could not be successfully delivered or processed after all retry attempts. ASAPIO maintains an internal DLQ (stored in SAP table <code>ZASAPIO_DLQ</code>) for all integration flows. DLQ entries include the original message payload, error details, and retry history. Failed messages can be replayed manually from Event Studio's Error Log tab. See <a href="inbound.html#dlq">Error Handling</a>.</p>
+</div>
+<div id="term-designer">
+<div>Designer</div>
+<p>ASAPIO's browser-based Event Studio UI for creating, configuring, testing, and deploying integration flows. Accessed via SAP transaction <code>/ASAPIO/DESIGNER</code>, which opens the URL <code>/sap/bc/ui5_ui5/asapio/designer</code> in the default browser. The Designer runs entirely within the SAP system with no external dependencies. See <a href="designer.html">Event Studio documentation</a>.</p>
+</div>
+<div id="e">E</div>
+<div id="term-event-mesh">
+<div>Event Mesh</div>
+<p>SAP BTP's managed message broker service, part of the SAP Integration Suite. Provides queues, topics, and webhook subscriptions with enterprise-grade reliability. Event Mesh supports CloudEvents 1.0 natively and is SAP's recommended event broker for SAP-to-SAP and SAP-to-cloud event-driven integration. See <a href="connector-sap-event-mesh.html">SAP Event Mesh connector</a>.</p>
+</div>
+<div id="f">F</div>
+<div id="term-flow">
+<div>Flow</div>
+<p>An integration configuration in ASAPIO that defines a complete integration scenario: source system, source event type, field mapping and transformations, optional filter conditions, target system, target action, and error handling settings. Flows are created and managed in ASAPIO Event Studio. A flow can be in Active (processing events) or Inactive (paused) state. Flows are versioned – the last 5 versions are retained for rollback.</p>
+</div>
+<div id="g">G</div>
+<div id="term-gdpr">
+<div>GDPR (General Data Protection Regulation)</div>
+<p>European Union regulation (EU 2016/679) governing the processing of personal data of EU residents. ASAPIO provides built-in GDPR compliance tools for the integration layer: data masking, audit logging, right-to-erasure support, retention policies, and consent management. See <a href="gdpr-functions.html">GDPR Functions</a>.</p>
+</div>
+<div id="i">I</div>
+<div id="term-idoc">
+<div>IDoc (Intermediate Document)</div>
+<p>SAP's proprietary message format for electronic data interchange (EDI), used primarily in SAP-to-SAP and SAP-to-EDI partner integrations. IDocs have a hierarchical structure with control record, data records, and status records. ASAPIO can receive IDoc-formatted XML via inbound flows and submit them to SAP via <code>IDOC_INBOUND_ASYNCHRONOUS</code>, and can also convert outbound SAP data to IDoc XML format.</p>
+</div>
+<div id="term-inbound">
+<div>Inbound</div>
+<p>The direction of data flow where an external system sends data to SAP via ASAPIO. The external system can push data to ASAPIO's HTTP webhook endpoint, or ASAPIO can poll a cloud message broker (Azure Service Bus, SQS, Kafka, etc.) for new messages. ASAPIO processes the received message and executes a configured SAP action. Contrast with <em>Outbound</em>. See <a href="inbound.html">Inbound Messaging documentation</a>.</p>
+</div>
+<div id="n">N</div>
+<div id="term-namespace">
+<div>Namespace (Event Mesh)</div>
+<p>A logical grouping prefix in SAP Event Mesh that organizes topics and queues. All topics and queues within an Event Mesh service instance must start with the namespace defined in the service key. Format: <code>default/&lt;domain&gt;/&lt;system&gt;/</code>. Example: <code>default/asapio.com/integration/</code>. Topic names within the namespace follow the pattern: <code>&lt;namespace&gt;&lt;module&gt;/&lt;event-type&gt;</code>.</p>
+</div>
+<div id="o">O</div>
+<div id="term-outbound">
+<div>Outbound</div>
+<p>The direction of data flow where SAP sends data to an external system via ASAPIO. Triggered by SAP business events (goods movement postings, purchase order creation, sales order changes, etc.) or by a scheduled batch job. ASAPIO transforms the SAP data using the flow's field mapping and publishes it to the configured target connector. Contrast with <em>Inbound</em>.</p>
+</div>
+<div id="r">R</div>
+<div id="term-rfc">
+<div>RFC (Remote Function Call)</div>
+<p>SAP's protocol for calling functions in remote SAP systems or calling ABAP function modules from external programs. RFC uses a proprietary binary protocol over TCP. Types: synchronous RFC (sRFC), asynchronous RFC (aRFC), background RFC (bgRFC). ASAPIO uses bgRFC internally for reliable outbound message delivery.</p>
+</div>
+<div id="s">S</div>
+<div id="term-sasl">
+<div>SASL (Simple Authentication and Security Layer)</div>
+<p>A framework for adding authentication support to connection-based protocols such as Kafka. ASAPIO's Kafka connector supports three SASL mechanisms: PLAIN (username/password in clear text – only safe over TLS), SCRAM-SHA-256 (salted challenge-response, more secure), and SCRAM-SHA-512 (stronger hash). For Confluent Cloud, SASL/PLAIN over TLS is standard. For self-hosted Kafka, SCRAM-SHA-256 is recommended.</p>
+</div>
+<div id="term-schema-registry">
+<div>Schema Registry</div>
+<p>A service that stores and serves schemas (Avro, JSON Schema, Protobuf) for Kafka messages. Confluent Schema Registry is the most widely used implementation. The schema ID is embedded in each Kafka message header, and consumers look up the schema from the registry to deserialize the message. ASAPIO integrates with Confluent Schema Registry for Avro and JSON Schema encoding. See <a href="connector-kafka.html#schema-registry">Schema Registry Integration</a>.</p>
+</div>
+<div id="term-sid">
+<div>SID (System ID)</div>
+<p>A 3-character alphanumeric identifier for an SAP system instance. Examples: <code>PRD</code> (production), <code>QAS</code> (quality assurance), <code>DEV</code> (development). The SID is displayed in the SAP system title bar and in transaction <code>SM51</code>. ASAPIO licenses are tied to SAP SIDs – each system in your landscape requires its own license key.</p>
+</div>
+<div id="term-ssf">
+<div>SSF / Secure Storage (SAP Secure Storage)</div>
+<p>SAP's secure storage facility for cryptographic material and sensitive configuration data. Implemented using PSE (Personal Security Environment) files managed via transaction <code>STRUST</code>. ASAPIO stores all connector credentials (API keys, passwords, client certificates, OAuth secrets) in SAP Secure Storage, never in plain-text Customizing tables.</p>
+</div>
+<div id="term-stms">
+<div>STMS (Transport Management System)</div>
+<p>The SAP transaction and framework for managing software transports between SAP systems in a landscape (DEV → QA → PRD). ASAPIO is installed via standard STMS transport import. Transaction <code>STMS</code> is used to upload transport files, add them to the import queue, and execute the import. See <a href="installation.html">Installation Guide</a>.</p>
+</div>
+<div id="t">T</div>
+<div id="term-tls">
+<div>TLS (Transport Layer Security)</div>
+<p>The standard protocol for encrypting network connections. All ASAPIO cloud connectors enforce TLS 1.2 as a minimum. TLS 1.3 is used when supported by the cloud platform. Server certificates are validated against the SAP system's trusted CA store (maintained in <code>STRUST</code>). For mTLS, client certificates are also presented during the TLS handshake.</p>
+</div>
+<div id="term-topic">
+<div>Topic</div>
+<p>A named channel for publishing and subscribing to messages in a messaging system. In Kafka, a topic is a log of ordered, immutable message records partitioned across one or more brokers. In Azure Service Bus and SAP Event Mesh, a topic supports multiple independent subscribers via subscriptions. ASAPIO integration flows are configured with a specific topic name for both outbound publishing and inbound subscription.</p>
+</div>
+<div id="w">W</div>
+<div id="term-webhook">
+<div>Webhook</div>
+<p>An HTTP callback mechanism where an external system sends an HTTP POST request to a pre-configured URL when an event occurs. ASAPIO's inbound HTTP endpoint acts as a webhook receiver – external systems POST messages to the ASAPIO endpoint URL, which processes them and executes SAP actions. See <a href="inbound.html#http-endpoint">Configuring an HTTP Inbound Endpoint</a>.</p>
+</div>
+</div>
+<nav>
+<a href="releases.html">
+<span>← Previous</span>
+<span>Release Notes</span>
+</a>
+<a href="index.html">
+<span>Back to start →</span>
+<span>Documentation Overview</span>
+</a>
+</nav>
+</main>
+<aside id="docs-toc">
+<div>On this page</div>
+<ul>
+<li><a href="#a">A – ABAP, AEM, AMQP, ATP, Avro</a></li>
+<li><a href="#b">B – BAPI, bgRFC, BTP</a></li>
+<li><a href="#c">C – CloudEvents, Consumer Group</a></li>
+<li><a href="#d">D – Dead Letter Queue, Designer</a></li>
+<li><a href="#e">E – Event Mesh</a></li>
+<li><a href="#f">F – Flow</a></li>
+<li><a href="#g">G – GDPR</a></li>
+<li><a href="#i">I – IDoc, Inbound</a></li>
+<li><a href="#n">N – Namespace</a></li>
+<li><a href="#o">O – Outbound</a></li>
+<li><a href="#r">R – RFC</a></li>
+<li><a href="#s">S – SASL, Schema Registry, SID, SSF, STMS</a></li>
+<li><a href="#t">T – TLS, Topic</a></li>
+<li><a href="#w">W – Webhook</a></li>
+</ul>
+</aside>
+</div>
+<footer>
+<div>
+<div>
+<div><a href="../index.html"><span><svg height="32" viewbox="0 0 40 40" width="32"><rect fill="#d25b51" height="40" rx="7" width="40"></rect><rect fill="white" height="9" rx="1.5" width="9" x="5" y="5"></rect><rect fill="white" height="9" rx="1.5" width="9" x="16" y="5"></rect><rect fill="white" height="9" rx="1.5" width="9" x="27" y="5"></rect><rect fill="white" height="9" rx="1.5" width="9" x="5" y="16"></rect><rect fill="white" height="9" rx="1.5" width="9" x="16" y="16"></rect><rect fill="white" height="9" rx="1.5" width="9" x="27" y="16"></rect><rect fill="white" height="9" rx="1.5" width="9" x="5" y="27"></rect><rect fill="white" height="9" rx="1.5" width="9" x="16" y="27"></rect></svg></span><span>ASAPIO</span></a><p>SAP integration specialists. Munich, Germany. Since 2003.</p><span>SAP Partner</span></div>
+<div><div>Solutions</div><div><a href="../integration/index.html">Cloud Integration</a><a href="../s4hana/index.html">S/4HANA</a><a href="../ariba/index.html">SAP Ariba</a><a href="../fieldglass/index.html">SAP Fieldglass</a></div></div>
+<div><div>Documentation</div><div><a href="index.html">Docs Home</a><a href="getting-started.html">Getting Started</a><a href="connectors.html">Connectors</a><a href="faq.html">FAQ</a></div></div>
+<div><div>Company</div><div><a href="../about.html">About ASAPIO</a><a href="../references.html">Case Studies</a><a href="../contact.php">Contact</a></div></div>
+</div>
+<div><p>© 2026 ASAPIO GmbH. All rights reserved.</p><div><a href="../privacy.html">Privacy Policy</a><a href="../impressum.html">Legal Notice</a><a href="../terms.html">Terms &amp; Conditions</a></div></div>
+</div>
+</footer>
+<button aria-label="Toggle sidebar" id="sidebar-toggle">☰</button>
+</body>
+</html>

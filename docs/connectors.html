@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="ASAPIO connectors overview – certified, production-ready connectors for Azure, Kafka, Solace, SAP Event Mesh, GCP, AWS and REST." name="description"/>
+<title>Connectors Overview – ASAPIO Docs</title>
+<link href="https://www.asapio.com/docs/connectors.html" hreflang="en" rel="alternate"/>
+<link href="https://www.asapio.com/de/docs/connectors.html" hreflang="de" rel="alternate"/>
+<link href="https://www.asapio.com/docs/connectors.html" hreflang="x-default" rel="alternate"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'&gt;&lt;rect width='32' height='32' rx='7' fill='%23d25b51'/&gt;&lt;text y='23' x='5' font-size='19' font-family='sans-serif' font-weight='bold' fill='white'&gt;A&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+</head>
+<body>
+
+
+<div>
+
+<main id="docs-content">
+<div>Connectors</div>
+<h1>Connectors Overview</h1>
+<p>ASAPIO provides certified, production-ready connectors for all major cloud messaging platforms. Each connector supports outbound (SAP → cloud) and inbound (cloud → SAP) directions, with enterprise-grade security and reliability built in.</p>
+<div>
+<a href="../integration/azure.html">
+<img alt="Microsoft Azure" height="40" src="img/logos/azure.svg" width="40"/>
+<span>Microsoft Azure</span>
+</a>
+<a href="../integration/aws.html">
+<img alt="Amazon Web Services" height="40" src="img/logos/aws.svg" width="40"/>
+<span>Amazon AWS</span>
+</a>
+<a href="../integration/google.html">
+<img alt="Google Cloud" height="40" src="img/logos/gcp.svg" width="40"/>
+<span>Google Cloud</span>
+</a>
+<a href="../integration/kafka.html">
+<img alt="Apache Kafka" height="40" src="img/logos/kafka.svg" width="40"/>
+<span>Apache Kafka</span>
+</a>
+<a href="../integration/confluent.html">
+<img alt="Confluent" height="40" src="img/logos/confluent.svg" width="40"/>
+<span>Confluent</span>
+</a>
+<a href="../integration/solace.html">
+<img alt="Solace PubSub+" height="40" src="img/partners/solace.png" width="40"/>
+<span>Solace PubSub+</span>
+</a>
+<a href="../integration/sap-aem.html">
+<img alt="SAP Advanced Event Mesh" height="40" src="img/logos/sap.svg" width="40"/>
+<span>SAP Adv. Event Mesh</span>
+</a>
+<a href="../integration/fabric-connector.html">
+<svg aria-hidden="true" fill="none" height="40" viewbox="0 0 40 40" width="40" xmlns="http://www.w3.org/2000/svg"><rect fill="#117865" height="40" rx="6" width="40"></rect><text fill="white" font-family="sans-serif" font-size="16" font-weight="bold" x="8" y="27">F</text></svg>
+<span>Microsoft Fabric</span>
+</a>
+</div>
+<img alt="Connector configuration screen" src="img/docs-connector-config.svg"/>
+<h2 id="architecture">Connector Architecture</h2>
+<p>All ASAPIO connectors share a common architecture designed for reliability and security in enterprise SAP environments:</p>
+<ul>
+<li><strong>ABAP-native</strong> – connectors run as pure ABAP code within the SAP work process. No external runtime, no middleware server, no additional infrastructure.</li>
+<li><strong>Secure credential storage</strong> – all credentials (tokens, API keys, passwords, client certificates) are stored in SAP Secure Storage (SSF/PSE), never in Customizing tables or application logs.</li>
+<li><strong>TLS 1.2+ enforced</strong> – all connections use TLS 1.2 as a minimum. TLS 1.3 is used when the cloud platform supports it.</li>
+<li><strong>Retry with exponential backoff</strong> – configurable retry logic: 3 attempts by default, with delays of 30 seconds, 2 minutes, and 10 minutes. Messages that exhaust all retries are placed in the Dead Letter Queue with full context.</li>
+<li><strong>bgRFC delivery</strong> – outbound messages are delivered via SAP's background Remote Function Call framework, ensuring messages are not lost even if the SAP system is restarted during delivery.</li>
+<li><strong>CloudEvents 1.0</strong> – all connectors support CloudEvents 1.0 JSON format by default (configurable per connector).</li>
+</ul>
+<h2 id="auth-methods">Authentication Methods</h2>
+<p>Each connector supports a range of authentication methods. The recommended method for each platform is listed below.</p>
+<table>
+<thead>
+<tr><th>Connector</th><th>Supported Auth Methods</th><th>Recommended</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>Azure Service Bus</td>
+<td>SAS Token, Azure AD OAuth 2.0, Managed Identity</td>
+<td>Azure AD OAuth 2.0 (SAS deprecated in v3.2.0)</td>
+</tr>
+<tr>
+<td>Azure Event Hub</td>
+<td>SAS Token, Azure AD OAuth 2.0</td>
+<td>Azure AD OAuth 2.0</td>
+</tr>
+<tr>
+<td>Apache Kafka / Confluent</td>
+<td>SASL/PLAIN, SASL/SCRAM-256, SASL/SCRAM-512, mTLS</td>
+<td>mTLS for self-hosted; SASL/SCRAM-512 for Confluent Cloud</td>
+</tr>
+<tr>
+<td>Solace PubSub+</td>
+<td>Basic (username/password), Client Certificate, OAuth 2.0</td>
+<td>OAuth 2.0</td>
+</tr>
+<tr>
+<td>SAP Event Mesh</td>
+<td>OAuth 2.0 (Client Credentials, via BTP service key)</td>
+<td>OAuth 2.0 (only option)</td>
+</tr>
+<tr>
+<td>Google Cloud Pub/Sub</td>
+<td>Service Account JSON key, Workload Identity</td>
+<td>Service Account JSON key</td>
+</tr>
+<tr>
+<td>AWS SNS / SQS</td>
+<td>Access Key + Secret Key, IAM Role via STS</td>
+<td>IAM Role via STS (no long-lived credentials)</td>
+</tr>
+<tr>
+<td>REST API</td>
+<td>API Key (header), Basic Auth, OAuth 2.0 Client Credentials</td>
+<td>OAuth 2.0 Client Credentials</td>
+</tr>
+</tbody>
+</table>
+<h2 id="azure-service-bus">Connector: Azure Service Bus</h2>
+<p>The Azure Service Bus connector enables reliable messaging between SAP and Azure, supporting queues, topics, and subscriptions with full enterprise messaging semantics including dead-lettering, sessions, and scheduled delivery.</p>
+<p>Protocols supported: AMQP 1.0 (recommended for performance) and HTTPS (for restricted network environments). See the <a href="connector-azure-service-bus.html">full Azure Service Bus connector reference</a> for configuration details.</p>
+<h2 id="event-hub">Connector: Azure Event Hub</h2>
+<p>Azure Event Hub is designed for high-throughput event streaming. Use it when you need to ingest SAP events at scale (millions per day) into Azure analytics pipelines, Azure Stream Analytics, or Azure Data Lake.</p>
+<ul>
+<li><strong>Event Hub Namespace</strong> – the fully qualified namespace name (e.g. <code>mycompany-events.servicebus.windows.net</code>)</li>
+<li><strong>Hub Name</strong> – the specific Event Hub within the namespace</li>
+<li><strong>Consumer Group</strong> – for inbound: the consumer group to use (default: <code>$Default</code>)</li>
+<li><strong>Partition Key Strategy</strong> – how to assign events to partitions: round-robin, SAP SID, or custom field value</li>
+<li><strong>Protocol</strong> – AMQP 1.0 (default) or HTTPS</li>
+</ul>
+<h2 id="kafka">Connector: Apache Kafka / Confluent</h2>
+<p>The Kafka connector supports both self-hosted Apache Kafka (2.6+) and Confluent Cloud. It provides high-throughput event streaming with exactly-once producer semantics, Avro and JSON Schema support via Confluent Schema Registry, and configurable consumer groups for inbound flows.</p>
+<p>See the <a href="connector-kafka.html">full Kafka / Confluent connector reference</a> for configuration details, Schema Registry integration, and performance tuning.</p>
+<h2 id="solace">Connector: Solace PubSub+</h2>
+<p>The Solace connector integrates with Solace PubSub+ (self-hosted and Solace Cloud). It supports AMQP 1.0 and the Solace native SMF protocol, topic subscriptions, and Dead Message Queue (DMQ) configuration.</p>
+<ul>
+<li><strong>Solace Cloud URL</strong> – the messaging service URL (e.g. <code>mr-xxxxxx.messaging.solace.cloud</code>)</li>
+<li><strong>VPN Name</strong> – the message VPN (e.g. <code>asapio-integration</code>)</li>
+<li><strong>Authentication</strong> – Basic (username/password), Client Certificate, or OAuth 2.0</li>
+<li><strong>Topic Subscriptions</strong> – wildcard topic subscriptions supported (e.g. <code>sap/s4hana/*/events/&gt;</code>)</li>
+<li><strong>DMQ</strong> – configure Dead Message Queue name for messages that cannot be delivered after all retries</li>
+<li><strong>Protocol</strong> – AMQP 1.0 (port 5671 TLS) or Solace native AMQP (port 55443)</li>
+</ul>
+<h2 id="sap-event-mesh">Connector: SAP Event Mesh</h2>
+<p>The SAP Event Mesh connector integrates with SAP BTP's managed message broker. It also supports SAP Advanced Event Mesh (AEM), powered by Solace technology, for enterprise-grade mesh topology and cross-region event replication.</p>
+<p>See the <a href="connector-sap-event-mesh.html">full SAP Event Mesh connector reference</a> for BTP service key setup, namespace configuration, and AEM-specific options.</p>
+<h2 id="aem">Connector: SAP Advanced Event Mesh</h2>
+<p>SAP Advanced Event Mesh extends Event Mesh with enterprise capabilities: broker links for connecting multiple event brokers, mesh topology for cross-region event replication, and dynamic message routing. AEM is generally available as of ASAPIO v3.2.0.</p>
+<p>Configuration is via SAP BTP service key – the AEM service key contains the broker URL, VPN name, and messaging endpoints. Paste the service key JSON into the connector configuration in Event Studio, or map individual fields manually.</p>
+<h2 id="gcp">Connector: Google Cloud Pub/Sub</h2>
+<p>The Google Cloud Pub/Sub connector supports both outbound (SAP publishes to a GCP topic) and inbound (SAP subscribes to a GCP subscription). Configuration highlights:</p>
+<ul>
+<li><strong>Service Account JSON</strong> – paste the GCP service account key JSON directly into the connector config. ASAPIO stores it in SAP Secure Storage.</li>
+<li><strong>Project ID and Topic/Subscription name</strong> – full resource path format: <code>projects/my-project/topics/sap-events</code></li>
+<li><strong>Message Ordering</strong> – enable ordering key support for ordered delivery within a topic partition</li>
+<li><strong>Exactly-Once Delivery</strong> – enable for subscriptions that require exactly-once processing (requires GCP exactly-once subscription type)</li>
+<li><strong>Naming Conventions</strong> – ASAPIO recommends topic naming: <code>sap-&lt;module&gt;-&lt;event-type&gt;</code>, e.g. <code>sap-mm-goods-movement</code></li>
+</ul>
+<h2 id="aws">Connector: AWS SNS / SQS</h2>
+<p>The AWS connector supports Amazon SNS (outbound: publish to topic) and Amazon SQS (inbound: poll queue). It also supports the SNS → SQS fan-out pattern common in AWS event-driven architectures.</p>
+<ul>
+<li><strong>Authentication</strong> – Access Key + Secret (for dev/test) or IAM Role via STS AssumeRole (recommended for production)</li>
+<li><strong>Region</strong> – AWS region (e.g. <code>eu-central-1</code>) – must match your SNS/SQS resource region</li>
+<li><strong>SNS Topic ARN</strong> – for outbound: full topic ARN, e.g. <code>arn:aws:sns:eu-central-1:123456789012:sap-events</code></li>
+<li><strong>SQS Queue URL</strong> – for inbound: full queue URL</li>
+<li><strong>FIFO Queue Support</strong> – supported; message group ID mapped from a configurable flow field</li>
+<li><strong>Polling Interval</strong> – for inbound SQS: configurable from 1 to 300 seconds (default: 30)</li>
+</ul>
+<h2 id="rest">Connector: REST API</h2>
+<p>The generic REST connector allows integration with any HTTP/HTTPS endpoint – external portals, custom APIs, legacy systems, or cloud services not covered by a dedicated connector.</p>
+<ul>
+<li><strong>Outbound</strong> – HTTP POST (default) or PUT to a configurable endpoint URL. Supports JSON and XML payloads.</li>
+<li><strong>Inbound</strong> – ASAPIO exposes an HTTP endpoint that accepts POST requests. See <a href="inbound.html">Inbound Messaging</a> for details.</li>
+<li><strong>Authentication</strong> – API Key (custom header name configurable), Basic Auth, OAuth 2.0 Client Credentials flow (token auto-refreshed).</li>
+<li><strong>Headers</strong> – configure custom HTTP headers (e.g. <code>X-API-Version: 2</code>, <code>Accept: application/json</code>)</li>
+<li><strong>TLS Client Certificate</strong> – mTLS supported; upload the client certificate in STRUST and reference it in the connector config.</li>
+</ul>
+<h2 id="compatibility">Compatibility Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Connector</th>
+<th>S/4HANA 1809</th>
+<th>S/4HANA 2020+</th>
+<th>ECC 6.0 EhP7</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Azure Service Bus</td><td>✓</td><td>✓</td><td>✓</td><td><span>GA</span></td></tr>
+<tr><td>Azure Event Hub</td><td>✓</td><td>✓</td><td>✓</td><td><span>GA</span></td></tr>
+<tr><td>Apache Kafka / Confluent</td><td>✓</td><td>✓</td><td>✓</td><td><span>GA</span></td></tr>
+<tr><td>Solace PubSub+</td><td>✓</td><td>✓</td><td>✓</td><td><span>GA</span></td></tr>
+<tr><td>SAP Event Mesh</td><td>✓</td><td>✓</td><td>✓</td><td><span>GA</span></td></tr>
+<tr><td>SAP Advanced Event Mesh</td><td>✓</td><td>✓</td><td>✓</td><td><span>GA</span></td></tr>
+<tr><td>Google Cloud Pub/Sub</td><td>✓</td><td>✓</td><td>✓</td><td><span>GA</span></td></tr>
+<tr><td>AWS SNS / SQS</td><td>✓</td><td>✓</td><td>✓</td><td><span>GA</span></td></tr>
+<tr><td>REST API</td><td>✓</td><td>✓</td><td>✓</td><td><span>GA</span></td></tr>
+<tr><td>StreamSets DataOps</td><td>✓</td><td>✓</td><td>–</td><td><span>Beta</span></td></tr>
+</tbody>
+</table>
+<nav>
+<a href="designer.html">
+<span>← Previous</span>
+<span>Event Studio</span>
+</a>
+<a href="connector-azure-service-bus.html">
+<span>Next →</span>
+<span>Azure Service Bus Connector</span>
+</a>
+</nav>
+</main>
+<aside id="docs-toc">
+<div>On this page</div>
+<ul>
+<li><a href="#architecture">Connector Architecture</a></li>
+<li><a href="#auth-methods">Authentication Methods</a></li>
+<li><a href="#azure-service-bus">Azure Service Bus</a></li>
+<li><a href="#event-hub">Azure Event Hub</a></li>
+<li><a href="#kafka">Kafka / Confluent</a></li>
+<li><a href="#solace">Solace PubSub+</a></li>
+<li><a href="#sap-event-mesh">SAP Event Mesh</a></li>
+<li><a href="#aem">SAP Advanced Event Mesh</a></li>
+<li><a href="#gcp">Google Cloud Pub/Sub</a></li>
+<li><a href="#aws">AWS SNS / SQS</a></li>
+<li><a href="#rest">REST API</a></li>
+<li><a href="#compatibility">Compatibility Matrix</a></li>
+</ul>
+</aside>
+</div>
+<footer>
+<div>
+<div>
+<div><a href="../index.html"><span><svg height="32" viewbox="0 0 40 40" width="32"><rect fill="#d25b51" height="40" rx="7" width="40"></rect><rect fill="white" height="9" rx="1.5" width="9" x="5" y="5"></rect><rect fill="white" height="9" rx="1.5" width="9" x="16" y="5"></rect><rect fill="white" height="9" rx="1.5" width="9" x="27" y="5"></rect><rect fill="white" height="9" rx="1.5" width="9" x="5" y="16"></rect><rect fill="white" height="9" rx="1.5" width="9" x="16" y="16"></rect><rect fill="white" height="9" rx="1.5" width="9" x="27" y="16"></rect><rect fill="white" height="9" rx="1.5" width="9" x="5" y="27"></rect><rect fill="white" height="9" rx="1.5" width="9" x="16" y="27"></rect></svg></span><span>ASAPIO</span></a><p>SAP integration specialists. Munich, Germany. Since 2003.</p><span>SAP Partner</span></div>
+<div><div>Solutions</div><div><a href="../integration/index.html">Cloud Integration</a><a href="../s4hana/index.html">S/4HANA</a><a href="../ariba/index.html">SAP Ariba</a><a href="../fieldglass/index.html">SAP Fieldglass</a></div></div>
+<div><div>Documentation</div><div><a href="index.html">Docs Home</a><a href="getting-started.html">Getting Started</a><a href="connectors.html">Connectors</a><a href="faq.html">FAQ</a></div></div>
+<div><div>Company</div><div><a href="../about.html">About ASAPIO</a><a href="../references.html">Case Studies</a><a href="../contact.php">Contact</a></div></div>
+</div>
+<div><p>© 2026 ASAPIO GmbH. All rights reserved.</p><div><a href="../privacy.html">Privacy Policy</a><a href="../impressum.html">Legal Notice</a><a href="../terms.html">Terms &amp; Conditions</a></div></div>
+</div>
+</footer>
+<button aria-label="Toggle sidebar" id="sidebar-toggle">☰</button>
+</body>
+</html>

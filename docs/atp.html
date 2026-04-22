@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Real-time ATP (Available-to-Promise) inventory integration from SAP using ASAPIO Integration Add-on." name="description"/>
+<title>Real-Time ATP (Inventory) – ASAPIO Docs</title>
+<link href="https://www.asapio.com/docs/atp/index.html" hreflang="en" rel="alternate"/>
+<link href="https://www.asapio.com/docs/atp/index.html" hreflang="x-default" rel="alternate"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'&gt;&lt;rect width='32' height='32' rx='7' fill='%23d25b51'/&gt;&lt;text y='23' x='5' font-size='19' font-family='sans-serif' font-weight='bold' fill='white'&gt;A&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+</head>
+<body>
+
+
+<div>
+
+<main id="docs-content">
+<p>Outbound Messaging</p>
+<h1>Real-Time ATP (Inventory)</h1>
+<div>
+<p>Push live Available-to-Promise (ATP) and inventory check results to external systems the moment they occur in SAP – enabling real-time stock visibility for e-commerce, supply-chain and analytics platforms without polling or batch exports.</p>
+</div>
+<h2 id="overview">Overview</h2>
+<p>ASAPIO supports real-time Available-to-Promise (ATP) / inventory level messaging. When stock-relevant documents are created or changed in SAP, ASAPIO triggers an ATP check via <code>BAPI_MATERIAL_AVAILABILITY</code> and sends the resulting inventory data (quantity, unit, plant, date) to the connected messaging platform in real time.</p>
+<p>This provides downstream systems (e.g. eCommerce platforms, order management systems) with accurate, event-driven inventory information without polling.</p>
+<h2 id="supported-bos">Supported Business Objects</h2>
+<table>
+<thead><tr><th>Business Object</th><th>Trigger</th></tr></thead>
+<tbody>
+<tr><td><code>BUS2032</code> (Sales Order)</td><td>Standard BO event</td></tr>
+<tr><td><code>BUS2012</code> (Purchase Order)</td><td>Standard BO event</td></tr>
+<tr><td><code>LIKP</code> (Delivery)</td><td>Standard BO event</td></tr>
+<tr><td><code>BUS2017</code> (Goods Movement)</td><td>BAdI <code>MB_DOCUMENT_UPDATE</code></td></tr>
+<tr><td><code>ZBUS2093</code> (Material Reservation)</td><td>User Exit <code>MBCF0007</code></td></tr>
+</tbody>
+</table>
+<h2 id="custom-extractor">Custom Extractor Function Module</h2>
+<p>The ATP extractor is implemented as a custom function module (e.g. <code>Z_ACI_EXTRACTOR_ATP</code>) that calls <code>BAPI_MATERIAL_AVAILABILITY</code> to retrieve the current stock situation and returns it in the ASAPIO extractor interface format.</p>
+<p>The key pattern in ABAP:</p>
+<pre><code>CALL FUNCTION 'BAPI_MATERIAL_AVAILABILITY'
+  EXPORTING
+    plant          = lv_werks
+    material       = lv_matnr
+    unit           = lv_meins
+  IMPORTING
+    av_qty_plt     = lv_quantity
+  TABLES
+    wmdvsx         = lt_schedule.</code></pre>
+<h2 id="badi">BAdI Implementation</h2>
+<p>The trigger is connected to ASAPIO via BAdI <code>/ASADEV/TRIGGER_BADI</code>, method <code>/ASADEV/TRIGGER_IF~SET_BDCP_LINES</code>. The BAdI method retrieves the triggering document key and populates the BDCP (change pointer) lines structure for ASAPIO to pick up.</p>
+<h2 id="output-format">Output JSON Format</h2>
+<p>The ATP payload sent to the messaging platform has the following structure:</p>
+<pre><code>{
+  "objectType": "BUS2032",
+  "werks": "1000",
+  "matnr": "000000000000012345",
+  "meins": "EA",
+  "date": "20241115",
+  "quantity": 150.000
+}</code></pre>
+<p>Fields:</p>
+<table>
+<thead><tr><th>Field</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>objectType</code></td><td>The SAP Business Object type that triggered the event</td></tr>
+<tr><td><code>werks</code></td><td>Plant code</td></tr>
+<tr><td><code>matnr</code></td><td>Material number (unformatted)</td></tr>
+<tr><td><code>meins</code></td><td>Base unit of measure</td></tr>
+<tr><td><code>date</code></td><td>Date of the ATP check (YYYYMMDD)</td></tr>
+<tr><td><code>quantity</code></td><td>Available quantity from BAPI_MATERIAL_AVAILABILITY</td></tr>
+</tbody>
+</table>
+</main>
+<aside id="docs-toc">
+<div>On this page</div>
+<nav><ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#supported-bos">Supported Business Objects</a></li>
+<li><a href="#custom-extractor">Custom Extractor FM</a></li>
+<li><a href="#badi">BAdI Implementation</a></li>
+<li><a href="#output-format">Output JSON Format</a></li>
+</ul></nav>
+</aside>
+</div>
+</body>
+</html>
