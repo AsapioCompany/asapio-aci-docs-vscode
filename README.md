@@ -1,43 +1,48 @@
-# ASAPIO MCP Server for Integration Add-on docs 
+npm install @modelcontextprotocol/sdk zod node-html-parser --omit=dev
 
-Search and retrieve **ASAPIO Integration Add-on documentation** directly inside GitHub Copilot Chat – no browser switching, no copy-pasting.
+# ASAPIO MCP Server for Integration Add-on Docs (Local-First)
+
+Search and retrieve **ASAPIO Integration Add-on documentation** directly inside GitHub Copilot Chat – with instant, local, focused answers and embedded images. No browser switching, no copy-pasting, no online fetches.
 
 ## Features
 
-- 🔍 **Full-text search** across all ASAPIO documentation pages
-- 📄 **Read any page** in full without leaving VS Code
+- ⚡ **Blazing fast, local-only docs** – all documentation is served from your local `/docs` folder
+- 🔍 **Full-text search** across all local documentation pages
+- 🎯 **Focused answers** – only the most relevant section (with images and formatting) is shown for your query
+- 🖼️ **Embedded images** – images are included inline, even in search results
 - 📋 **Browse all pages** with titles and links
-- 🔄 **Always up to date** – docs are fetched live from asapio.com/docs/
+- 🔄 **Manual reload** – refresh the local doc index at any time
 
 ## Getting Started
 
-1. Install this extension
-2. Restart VS Code
-3. Open Copilot Chat and try:
-
-npm install @modelcontextprotocol/sdk zod node-html-parser --omit=dev
-```
-Search the ASAPIO documentation for "connector setup"
-List all available ASAPIO documentation pages
-How do I configure a new user in ACI?
-```
+1. Get yourself a good cup of coffee or tea
+2. Install this extension and its dependencies:
+	```sh
+	npm install --omit=dev
+	```
+3. Restart VS Code
+4. Open Copilot Chat and try:
+	- `search_docs` – Search for "connector setup"
+	- `list_docs` – List all available documentation pages
+	- `get_doc` – Get the most relevant section from a page
 
 ## Available Commands (Copilot Chat)
 
-| Command | Description |
-|---------|-------------|
-| `search_docs` | Search documentation by keyword |
-| `get_doc` | Get the full content of a page |
-| `list_docs` | List all available pages |
-| `get_doc_sections` | Show the outline of a page |
-| `reload_docs` | Refresh the documentation cache |
+| Command         | Description                                      |
+|-----------------|--------------------------------------------------|
+| `search_docs`   | Search documentation by keyword (focused answer) |
+| `get_doc`       | Get the most relevant section of a page          |
+| `list_docs`     | List all available pages                         |
+| `get_doc_sections` | Show the outline of a page                    |
+| `reload_docs`   | Refresh the documentation cache                  |
 
 ## Settings
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `asapioAciDocs.docsBaseUrl` | `https://asapio.com/docs` | Documentation base URL |
-| `asapioAciDocs.cacheTtlSeconds` | `3600` | Cache lifetime in seconds |
+| Setting                        | Default | Description                        |
+|--------------------------------|---------|------------------------------------|
+| `asapioAciDocs.cacheTtlSeconds`| `3600`  | Cache lifetime in seconds           |
+
+> **Note:** The `docsBaseUrl` setting and all online fetching have been removed. All docs are local-only for maximum speed and privacy.
 
 ## Requirements
 
@@ -46,5 +51,5 @@ How do I configure a new user in ACI?
 
 ## License
 
-MIT – see [LICENSE](LICENSE).  
+MIT – see [LICENSE](LICENSE).
 Documentation content © ASAPIO GmbH. All rights reserved.
