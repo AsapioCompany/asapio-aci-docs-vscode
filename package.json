@@ -2,7 +2,7 @@
   "name": "asapio-aci-docs",
   "displayName": "ASAPIO Docs MCP",
   "description": "MCP Server for ASAPIO Integration Add-on Documentation – search and retrieve docs directly in GitHub Copilot Chat",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "publisher": "ASAPIO",
   "author": "ASAPIO GmbH <info@asapio.com>",
   "license": "MIT",
@@ -10,7 +10,7 @@
   "homepage": "https://asapio.com/docs",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AsapioCompany/mcp-aci-docs.git"
+    "url": "https://github.com/AsapioCompany/asapio-aci-docs-vscode.git"
   },
   "engines": {
     "vscode": "^1.99.0"
@@ -46,12 +46,28 @@
     },
     "commands": [
       {
-        "command": "asapioAciDocs.reload",
-        "title": "ASAPIO ACI Docs: Reload Documentation Cache"
+        "command": "asapio-reload",
+        "title": "ASAPIO: Reload Documentation Cache"
       },
       {
-        "command": "asapioAciDocs.showStatus",
-        "title": "ASAPIO ACI Docs: Show Status"
+        "command": "asapio-status",
+        "title": "ASAPIO: Show Status"
+      },
+      {
+        "command": "asapio-search",
+        "title": "ASAPIO: Search Documentation"
+      },
+      {
+        "command": "asapio-list",
+        "title": "ASAPIO: List Documentation Pages"
+      },
+      {
+        "command": "asapio-get",
+        "title": "ASAPIO: Get Section from Page"
+      },
+      {
+        "command": "asapio-outline",
+        "title": "ASAPIO: Show Page Outline"
       },
       {
         "command": "asapio.asapio",

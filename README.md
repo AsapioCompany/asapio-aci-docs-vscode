@@ -1,40 +1,44 @@
-npm install @modelcontextprotocol/sdk zod node-html-parser --omit=dev
+# ASAPIO MCP Server for Integration Add-on Docs
 
-# ASAPIO MCP Server for Integration Add-on Docs (Local-First)
-
-Search and retrieve **ASAPIO Integration Add-on documentation** directly inside GitHub Copilot Chat – with instant, local, focused answers and embedded images. No browser switching, no copy-pasting, no online fetches.
+Search and retrieve **ASAPIO Integration Add-on documentation** directly inside GitHub Copilot Chat or the VS Code command palette – with instant, local, focused answers. No browser switching, no copy-pasting, no online fetches.
 
 ## Features
 
-- ⚡ **Blazing fast, local-only docs** – all documentation is served from your local `/docs` folder
-- 🔍 **Full-text search** across all local documentation pages
-- 🎯 **Focused answers** – only the most relevant section (with images and formatting) is shown for your query
-- 🖼️ **Embedded images** – images are included inline, even in search results
+- ⚡ **Blazing fast, local-only docs** – all documentation is served from your local `/docs` folder (Markdown only)
+- 🔍 **Full-text search** across all local documentation pages, prioritized by an overview map
+- 🎯 **Focused answers** – only the most relevant section (with formatting) is shown for your query
+- 🖼️ **Images** – Markdown image links are preserved and rendered inline if accessible in VS Code
 - 📋 **Browse all pages** with titles and links
 - 🔄 **Manual reload** – refresh the local doc index at any time
+- 💬 **/asapio command** – Search ASAPIO docs from the command palette or chat with `/asapio <query>`
 
 ## Getting Started
 
-1. Get yourself a good cup of coffee or tea
-2. Install this extension and its dependencies:
+1. Make sure you have a `/docs` folder with your Markdown documentation files in your workspace.
+2. Install this extension from the VSIX file or Marketplace, or clone and run:
 	```sh
 	npm install --omit=dev
 	```
-3. Restart VS Code
-4. Open Copilot Chat and try:
-	- `search_docs` – Search for "connector setup"
-	- `list_docs` – List all available documentation pages
-	- `get_doc` – Get the most relevant section from a page
+3. Restart VS Code to activate the extension.
+4. Open GitHub Copilot Chat or the VS Code command palette and try:
+	- `/asapio <your query>` – Search ASAPIO docs from anywhere
+	- `asapio-search` – Search for "connector setup"
+	- `asapio-list` – List all available documentation pages
+	- `asapio-get` – Get the most relevant section from a page
+5. If you add or update docs, use the `asapio-reload` command to refresh the index.
 
-## Available Commands (Copilot Chat)
+> All documentation is local-only and must be in Markdown format.
+
+## Available Commands
 
 | Command         | Description                                      |
 |-----------------|--------------------------------------------------|
-| `search_docs`   | Search documentation by keyword (focused answer) |
-| `get_doc`       | Get the most relevant section of a page          |
-| `list_docs`     | List all available pages                         |
-| `get_doc_sections` | Show the outline of a page                    |
-| `reload_docs`   | Refresh the documentation cache                  |
+| `/asapio`       | Search ASAPIO docs from palette or chat          |
+| `asapio-search` | Search documentation by keyword (focused answer) |
+| `asapio-get`    | Get the most relevant section of a page          |
+| `asapio-list`   | List all available pages                         |
+| `asapio-outline`| Show the outline of a page                       |
+| `asapio-reload` | Refresh the documentation cache                  |
 
 ## Settings
 
@@ -42,7 +46,12 @@ Search and retrieve **ASAPIO Integration Add-on documentation** directly inside 
 |--------------------------------|---------|------------------------------------|
 | `asapioAciDocs.cacheTtlSeconds`| `3600`  | Cache lifetime in seconds           |
 
-> **Note:** The `docsBaseUrl` setting and all online fetching have been removed. All docs are local-only for maximum speed and privacy.
+
+> **Note:**
+> - All docs must be Markdown (`.md`) files in the `/docs` folder.
+> - The extension uses `overview.md` to prioritize and map queries to the right file.
+> - Images are rendered inline if the path is accessible in VS Code. Base64 embedding is not enabled by default.
+> - The `docsBaseUrl` setting and all online fetching have been removed. All docs are local-only for maximum speed and privacy.
 
 ## Requirements
 

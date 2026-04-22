@@ -19,10 +19,43 @@ const MCP_SERVER_KEY = "asapio-aci-docs";
 async function activate(context) {
   // Register commands
   context.subscriptions.push(
-    vscode.commands.registerCommand("asapioAciDocs.reload",     handleReload),
-    vscode.commands.registerCommand("asapioAciDocs.showStatus", handleShowStatus),
-    vscode.commands.registerCommand("asapio.asapio", handleAsapioCommand)
+    vscode.commands.registerCommand("asapio-reload",     handleReload),
+    vscode.commands.registerCommand("asapio-status",     handleShowStatus),
+    vscode.commands.registerCommand("asapio-search",     handleAsapioSearch),
+    vscode.commands.registerCommand("asapio-list",       handleAsapioList),
+    vscode.commands.registerCommand("asapio-get",        handleAsapioGet),
+    vscode.commands.registerCommand("asapio-outline",    handleAsapioOutline),
+    vscode.commands.registerCommand("asapio.asapio",     handleAsapioCommand)
   );
+// ─── New Command Handlers ─────────────────────────────────────────────────--
+async function handleAsapioSearch() {
+  const query = await vscode.window.showInputBox({
+    prompt: "Search ASAPIO documentation (type your question or topic)",
+    placeHolder: "e.g. connector setup, event mesh, monitoring..."
+  });
+  if (!query) return;
+  vscode.window.showInformationMessage(`Searching ASAPIO docs for: ${query}`);
+  // TODO: Integrate with MCP server search
+}
+
+async function handleAsapioList() {
+  vscode.window.showInformationMessage("Listing all ASAPIO documentation pages...");
+  // TODO: Integrate with MCP server list_docs
+}
+
+async function handleAsapioGet() {
+  const page = await vscode.window.showInputBox({ prompt: "Enter the page name (e.g. monitoring.md)" });
+  if (!page) return;
+  vscode.window.showInformationMessage(`Getting most relevant section from: ${page}`);
+  // TODO: Integrate with MCP server get_doc
+}
+
+async function handleAsapioOutline() {
+  const page = await vscode.window.showInputBox({ prompt: "Enter the page name for outline (e.g. monitoring.md)" });
+  if (!page) return;
+  vscode.window.showInformationMessage(`Showing outline for: ${page}`);
+  // TODO: Integrate with MCP server get_doc_sections
+}
 
   // Listen for 'asapio' in editor selection
   context.subscriptions.push(
