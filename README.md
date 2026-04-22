@@ -4,17 +4,17 @@ Search and retrieve **ASAPIO Integration Add-on documentation** directly inside 
 
 ## Features
 
-- ⚡ **Blazing fast, local-only docs** – all documentation is served from your local `/docs` folder (Markdown only)
+- ⚡ **Blazing fast, local-only docs** – all documentation is served from the `/docs` folder inside the extension
 - 🔍 **Full-text search** across all local documentation pages, prioritized by an overview map
 - 🎯 **Focused answers** – only the most relevant section (with formatting) is shown for your query
-- 🖼️ **Images** – Markdown image links are preserved and rendered inline if accessible in VS Code
+- 🖼️ **Images** – Markdown image links are preserved and rendered inline if accessible in VS Code. All image paths must be relative (e.g. `img/...`) and images must be in `/docs/img/` inside the extension.
 - 📋 **Browse all pages** with titles and links
 - 🔄 **Manual reload** – refresh the local doc index at any time
 - 💬 **/asapio command** – Search ASAPIO docs from the command palette or chat with `/asapio <query>`
 
 ## Getting Started
 
-1. Make sure you have a `/docs` folder with your Markdown documentation files in your workspace.
+1. Get yourself a cup of coffee.
 2. Install this extension from the VSIX file or Marketplace, or clone and run:
 	```sh
 	npm install --omit=dev
@@ -26,8 +26,6 @@ Search and retrieve **ASAPIO Integration Add-on documentation** directly inside 
 	- `asapio-list` – List all available documentation pages
 	- `asapio-get` – Get the most relevant section from a page
 5. If you add or update docs, use the `asapio-reload` command to refresh the index.
-
-> All documentation is local-only and must be in Markdown format.
 
 ## Available Commands
 
@@ -47,11 +45,10 @@ Search and retrieve **ASAPIO Integration Add-on documentation** directly inside 
 | `asapioAciDocs.cacheTtlSeconds`| `3600`  | Cache lifetime in seconds           |
 
 
+
 > **Note:**
-> - All docs must be Markdown (`.md`) files in the `/docs` folder.
 > - The extension uses `overview.md` to prioritize and map queries to the right file.
 > - Images are rendered inline if the path is accessible in VS Code. Base64 embedding is not enabled by default.
-> - The `docsBaseUrl` setting and all online fetching have been removed. All docs are local-only for maximum speed and privacy.
 
 ## Requirements
 

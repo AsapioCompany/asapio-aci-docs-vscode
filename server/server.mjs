@@ -60,7 +60,9 @@ function findDocsForQuery(query) {
 // ─── Configuration ────────────────────────────────────────────────────────────
 
 const CACHE_TTL_MS  = parseInt(process.env.CACHE_TTL_SECONDS || "3600") * 1000; // default: 1 hour
-const LOCAL_DOCS_DIR = path.resolve(process.cwd(), "../docs");
+// Use docs folder inside the extension directory
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const LOCAL_DOCS_DIR = path.resolve(__dirname, "../docs");
 // ─── Local Docs Helpers ─────────────────────────────────────────────────────
 
 function listLocalDocs() {
