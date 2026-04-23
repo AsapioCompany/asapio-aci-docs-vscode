@@ -11,46 +11,20 @@ import path from "path";
 import { marked } from "marked";
 
 // ─── Overview Mapping ───────────────────────────────────────────────────────
-let overviewMap = null;
-let docCache = new Map();
-function loadOverviewMap() {
-  const overviewPath = path.join(LOCAL_DOCS_DIR, "overview.md");
-  if (!fs.existsSync(overviewPath)) return null;
-  const md = fs.readFileSync(overviewPath, "utf-8");
-  // Simple parser: map [Title](file.md) to file.md, collect section headings
-  const lines = md.split(/\r?\n/);
-  const map = {};
-  let currentFile = null;
-  for (const line of lines) {
-    const m = line.match(/^###? \[(.+?)\]\((.+?\.md)\)/);
-    if (m) {
-      currentFile = m[2];
-      map[currentFile] = { title: m[1], sections: [] };
-      continue;
-    }
-    const sec = line.match(/^- \*\*(.+?)\*\*/);
-    if (currentFile && sec) {
-      map[currentFile].sections.push(sec[1]);
-    }
-  }
-  return map;
-}
 
-function findDocsForQuery(query) {
-  if (!overviewMap) overviewMap = loadOverviewMap();
-  if (!overviewMap) return [];
-  const q = query.toLowerCase();
-  // Score by title and section match
-  const scored = Object.entries(overviewMap).map(([file, { title, sections }]) => {
-    let score = 0;
-    if (title.toLowerCase().includes(q)) score += 10;
-    for (const s of sections) {
-      if (s.toLowerCase().includes(q)) score += 5;
-    }
-    return { file, title, score };
-  });
-  return scored.filter(s => s.score > 0).sort((a, b) => b.score - a.score);
+// Persistent index and search cache
+const DOCS_INDEX_FILE = path.resolve(__dirname, "docs_index.json");
+let docsIndex = [];
+let searchCache = new Map(); // key: query, value: { results, timestamp }
+
+function loadDocsIndex() {
+  if (fs.existsSync(DOCS_INDEX_FILE)) {
+    docsIndex = JSON.parse(fs.readFileSync(DOCS_INDEX_FILE, "utf-8"));
+  } else {
+    docsIndex = [];
+  }
 }
+loadDocsIndex();
 
 /**
  * ASAPIO ACI Docs – MCP Server (mcp-aci-docs)
@@ -64,6 +38,9 @@ const CACHE_TTL_MS  = parseInt(process.env.CACHE_TTL_SECONDS || "3600") * 1000; 
 // Use docs folder inside the extension directory
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const LOCAL_DOCS_DIR = path.resolve(__dirname, "../docs");
+
+// Read image serving mode from VS Code config via env var (set by extension)
+const IMAGE_SERVING_MODE = process.env.ASAPIO_IMAGE_SERVING_MODE || "relative";
 // ─── Local Docs Helpers ─────────────────────────────────────────────────────
 
 function listLocalDocs() {
@@ -125,25 +102,8 @@ function parseDoc(md, url) {
   return { url, path: url, title, description, content, headings, sections };
 }
 
-// ─── Build index ──────────────────────────────────────────────────────────────
 
-async function buildIndex(force = false) {
-  if (indexCache) return indexCache.pages;
-
-  // Only use local docs, ignore online
-  const localFiles = listLocalDocs();
-  if (localFiles.length === 0) {
-    indexCache = { pages: [], builtAt: Date.now() };
-    return [];
-  }
-  const pages = localFiles.map(f => {
-    const html = readLocalDoc(f);
-    const url = `file://${f}`;
-    return parseDoc(html, url);
-  });
-  indexCache = { pages, builtAt: Date.now() };
-  return pages;
-}
+// ─── Search & Section Scoring (Fuzzy, Phrase, Context) ─────────────────────--
 
 
 // ─── Search & Section Scoring (Fuzzy, Phrase, Context) ─────────────────────--
@@ -170,72 +130,51 @@ function embedImagesInMarkdown(md, docDir) {
     if (/^(https?:|data:)/i.test(relPath)) return match;
     const imgPath = path.resolve(docDir, relPath);
     if (fs.existsSync(imgPath)) {
-      const ext = path.extname(imgPath).slice(1).toLowerCase();
-      const mime = ext === "svg" ? "image/svg+xml" : `image/${ext}`;
-      const data = fs.readFileSync(imgPath);
-      const base64 = data.toString("base64");
-      return `![${alt}](data:${mime};base64,${base64})`;
+      if (IMAGE_SERVING_MODE === "base64") {
+        const ext = path.extname(imgPath).slice(1).toLowerCase();
+        const mime = ext === "svg" ? "image/svg+xml" : `image/${ext}`;
+        const data = fs.readFileSync(imgPath);
+        const base64 = data.toString("base64");
+        return `![${alt}](data:${mime};base64,${base64})`;
+      } else {
+        // workspace-relative path (default)
+        const relToWorkspace = path.relative(process.cwd(), imgPath).replace(/\\/g, "/");
+        return `![${alt}](${relToWorkspace})`;
+      }
     }
     return match;
   });
 }
 
+
 async function searchDocs(query, limit = 5) {
-  // Ask user for configuration method
-  let preferEventStudio = false;
-  if (typeof globalThis.promptEventStudio === 'function') {
-    preferEventStudio = await globalThis.promptEventStudio();
+  // Check cache first
+  const cacheKey = `${query}|${limit}`;
+  const cacheEntry = searchCache.get(cacheKey);
+  if (cacheEntry && Date.now() - cacheEntry.timestamp < 1000 * 60 * 10) { // 10 min cache
+    return cacheEntry.results;
   }
-  // Use overview map to prioritize relevant docs
-  let overviewHits = findDocsForQuery(query);
-  let prioritizedFiles;
-  if (preferEventStudio) {
-    // Always include eventstudio.md and any connector page in the top results
-    const eventStudioFile = overviewHits.find(h => h.file === 'eventstudio.md');
-    // Heuristic: connector pages often have 'connector' or 'connectors/' in the filename
-    const connectorFiles = overviewHits.filter(h => /connector|connectors\//i.test(h.file));
-    const rest = overviewHits.filter(h => h.file !== 'eventstudio.md' && !/connector|connectors\//i.test(h.file));
-    prioritizedFiles = [
-      ...(eventStudioFile ? [eventStudioFile] : []),
-      ...connectorFiles,
-      ...rest
-    ].map(h => path.join(LOCAL_DOCS_DIR, h.file));
-  } else {
-    prioritizedFiles = overviewHits.map(h => path.join(LOCAL_DOCS_DIR, h.file));
-  }
-  if (prioritizedFiles.length === 0) {
-    prioritizedFiles = listLocalDocs();
-  }
+  // Score all docs/sections in persistent index
   const results = [];
-  for (const f of prioritizedFiles) {
-    const md = readLocalDoc(f);
-    if (!md) continue;
-    const url = `file://${f}`;
-      let p = docCache.get(f + ':parsed');
-      if (!p) {
-        p = parseDoc(md, url);
-        docCache.set(f + ':parsed', p);
+  for (const doc of docsIndex) {
+    const docPath = path.join(LOCAL_DOCS_DIR, doc.file);
+    for (const section of doc.sections || []) {
+      const score = scoreSection(section, query);
+      if (score > 0) {
+        // Embed images in the section markdown
+        const docDir = path.dirname(docPath);
+        let mdWithImages = embedImagesInMarkdown(section.md, docDir);
+        // Highlight matches
+        const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")})`, 'gi');
+        mdWithImages = mdWithImages.replace(re, '**$1**');
+        results.push({ ...doc, bestSection: { ...section, md: mdWithImages }, score });
       }
-    // Score all sections, not just best
-    const scoredSections = (p.sections || []).map(section => {
-      return { section, score: scoreSection(section, query) };
-    }).filter(s => s.score > 0);
-    // Sort and take top N sections per file
-    scoredSections.sort((a, b) => b.score - a.score);
-    const topSections = scoredSections.slice(0, 2); // up to 2 per file
-    for (const {section, score} of topSections) {
-      // Embed images in the section markdown
-      const docDir = path.dirname(f);
-      let mdWithImages = embedImagesInMarkdown(section.md, docDir);
-      // Highlight matches
-      const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, 'gi');
-      mdWithImages = mdWithImages.replace(re, '**$1**');
-      results.push({ ...p, bestSection: {...section, md: mdWithImages}, score });
-      if (results.length >= limit) break;
     }
     if (results.length >= limit) break;
   }
-  return results.sort((a, b) => b.score - a.score).slice(0, limit);
+  const sorted = results.sort((a, b) => b.score - a.score).slice(0, limit);
+  searchCache.set(cacheKey, { results: sorted, timestamp: Date.now() });
+  return sorted;
 }
 
 
@@ -338,8 +277,8 @@ server.tool(
   "Lists all available ASAPIO documentation pages with titles and URLs.",
   {},
   async () => {
-    const pages = await buildIndex();
-    const lines = pages.map((p) => `- **${p.title}** → ${p.url}`);
+    const pages = docsIndex;
+    const lines = pages.map((p) => `- **${p.title}** → ${p.file}`);
     return {
       content: [{ type: "text", text: `## ASAPIO ACI Documentation (${pages.length} pages)\n\n${lines.join("\n")}` }],
     };

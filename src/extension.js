@@ -78,21 +78,7 @@ async function handleAsapioOutline() {
   // TODO: Integrate with MCP server get_doc_sections
 }
 
-  // Listen for 'asapio' in editor selection
-  context.subscriptions.push(
-    vscode.window.onDidChangeTextEditorSelection(async (e) => {
-      const text = e.textEditor.document.getText(e.selections[0]);
-      if (text && /asapio/i.test(text)) {
-        const action = await vscode.window.showInformationMessage(
-          `You selected text containing 'asapio'. Search ASAPIO documentation?`,
-          'Search', 'Ignore'
-        );
-        if (action === 'Search') {
-          vscode.commands.executeCommand('asapio.asapio', text);
-        }
-      }
-    })
-  );
+  // (Feature removed) No longer reacts on text highlighting 'asapio' in editor selection.
 
   // Listen for 'asapio' in command palette input (Quick Open)
   context.subscriptions.push(
@@ -131,7 +117,7 @@ function deactivate() {}
 async function ensureMcpConfig(context) {
   const config   = vscode.workspace.getConfiguration("asapioAciDocs");
   const docsUrl  = config.get("docsBaseUrl",     "https://asapio.com/docs");
-  const cacheTtl = config.get("cacheTtlSeconds",  3600);
+  const imageMode = config.get("imageServingMode", "relative");
 
   // server.js is bundled inside the extension under server/
   const serverJs = context.asAbsolutePath("server/server.mjs");
@@ -158,7 +144,7 @@ async function ensureMcpConfig(context) {
       args:    [serverJs],
       env: {
         DOCS_BASE_URL:     docsUrl,
-        CACHE_TTL_SECONDS: String(cacheTtl),
+        ASAPIO_IMAGE_SERVING_MODE: imageMode,
       },
     };
 

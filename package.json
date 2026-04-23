@@ -2,7 +2,7 @@
   "name": "asapio-aci-docs",
   "displayName": "ASAPIO Docs MCP",
   "description": "MCP Server for ASAPIO Integration Add-on Documentation – search and retrieve docs directly in GitHub Copilot Chat",
-  "version": "1.2.5",
+  "version": "1.3.0",
   "publisher": "ASAPIO",
   "author": "ASAPIO GmbH <info@asapio.com>",
   "license": "MIT",
@@ -37,10 +37,11 @@
     "configuration": {
       "title": "ASAPIO ACI Docs",
       "properties": {
-        "asapioAciDocs.cacheTtlSeconds": {
-          "type": "number",
-          "default": 86400,
-          "description": "How long to cache documentation pages (in seconds)"
+        "asapioAciDocs.imageServingMode": {
+          "type": "string",
+          "enum": ["relative", "base64"],
+          "default": "relative",
+          "description": "How to serve images in documentation: 'relative' (workspace-relative path, default) or 'base64' (embed as data URL)"
         }
       }
     },
@@ -86,8 +87,9 @@
     "zod": "^4.3.6"
   },
   "scripts": {
-    "package": "vsce package",
-    "publish": "vsce publish"
+    "prepackage": "node ./server/build_index.js",
+    "package": "npm run prepackage && vsce package",
+    "publish": "npm run prepackage && vsce publish"
   },
   "devDependencies": {
     "@types/vscode": "^1.99.0",

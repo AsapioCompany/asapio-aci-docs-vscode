@@ -40,9 +40,9 @@ Search and retrieve **ASAPIO Integration Add-on documentation** directly inside 
 
 ## Settings
 
-| Setting                        | Default | Description                        |
-|--------------------------------|---------|------------------------------------|
-| `asapioAciDocs.cacheTtlSeconds`| `3600`  | Cache lifetime in seconds           |
+| Setting                              | Default   | Description                                                                 |
+|--------------------------------------|-----------|-----------------------------------------------------------------------------|
+| `asapioAciDocs.imageServingMode`     | `relative`| How to serve images: `relative` (workspace path, default) or `base64` (embed as data URL) |
 
 
 
