@@ -2,6 +2,7 @@
 *.vsix
 .gitignore
 remove-unreferenced-images.js
+server/clean_trademarks.js
 # Exclude all node_modules except required ones
 node_modules/**
 !node_modules/@modelcontextprotocol/**
